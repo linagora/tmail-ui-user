@@ -4211,5 +4211,21 @@
       "total": {},
       "folderName": {}
     }
+  },
+  "mailsInMailboxAreSelected": "mails in {folderName} are selected. ",
+  "@mailsInMailboxAreSelected": {
+    "type": "text",
+    "placeholders_order": [
+      "folderName"
+    ],
+    "placeholders": {
+      "folderName": {}
+    }
+  },
+  "clearSelection": "Clear selection",
+  "@clearSelection": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
   }
 }
