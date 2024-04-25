@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2024-12-09T13:59:58.460897",
+  "@@last_modified": "2024-12-10T16:48:40.092308",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4193,5 +4193,23 @@
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
+  },
+  "mailsOnThisPageAreSelected": "mails on this page are selected. ",
+  "@mailsOnThisPageAreSelected": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "selectAllMailInMailbox": "Select all {total} mails in {folderName}",
+  "@selectAllMailInMailbox": {
+    "type": "text",
+    "placeholders_order": [
+      "total",
+      "folderName"
+    ],
+    "placeholders": {
+      "total": {},
+      "folderName": {}
+    }
   }
 }
