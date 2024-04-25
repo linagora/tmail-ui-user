@@ -18,7 +18,6 @@ import 'package:tmail_ui_user/features/manage_account/presentation/extensions/va
 import 'package:tmail_ui_user/features/manage_account/presentation/vacation/widgets/vacation_notification_message_widget.dart';
 import 'package:tmail_ui_user/features/network_connection/presentation/network_connection_banner_widget.dart';
 import 'package:tmail_ui_user/features/quotas/presentation/widget/quotas_banner_widget.dart';
-import 'package:tmail_ui_user/features/thread/domain/constants/thread_constants.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/filter_message_option.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/get_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/search_email_state.dart';
@@ -166,14 +165,13 @@ class ThreadView extends GetWidget<ThreadController>
                       }),
                       if (!controller.responsiveUtils.isDesktop(context))
                         _buildMarkAsMailboxReadLoading(context),
-                      if (PlatformInfo.isWeb)
+                      if (controller.responsiveUtils.isWebDesktop(context))
                         Obx(() {
-                          if (controller.mailboxDashBoardController.isSelectionEnabled()) {
+                          if (controller.validateToShowSelectionEmailsBanner()) {
                             return SelectAllEmailInMailboxBanner(
-                              limitEmailsInPage: ThreadConstants.defaultLimit.value.toInt(),
-                              totalEmails: controller.mailboxDashBoardController.selectedMailbox.value?.totalEmails?.value.value.toInt() ?? 0,
-                              folderName: controller.mailboxDashBoardController.selectedMailbox.value?.getDisplayName(context)
-                                ?? AppLocalizations.of(context).folder.toLowerCase(),
+                              limitEmailsInPage: controller.mailboxDashBoardController.listEmailSelected.length,
+                              totalEmails: controller.mailboxDashBoardController.selectedMailbox.value!.totalEmails!.value.value.toInt(),
+                              folderName: controller.mailboxDashBoardController.selectedMailbox.value!.getDisplayName(context),
                               onSelectAllEmailAction: controller.enableSelectAllEmails,
                               onClearSelection: controller.cancelSelectEmail
                             );
