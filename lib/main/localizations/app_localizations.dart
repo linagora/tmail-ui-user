@@ -4401,7 +4401,6 @@ class AppLocalizations {
       name: 'doYouWantToLogOutAndSwitchTo',
     );
   }
-}
 
   String get mailsOnThisPageAreSelected {
     return Intl.message(
