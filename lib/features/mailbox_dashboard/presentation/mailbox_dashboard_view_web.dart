@@ -248,6 +248,7 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
                       listEmails,
                       actionType
                     )),
+                  onMoreSelectedEmailAction: (position) => controller.dispatchAction(MoreSelectedEmailAction(context, position)),
                 ),
               );
             } else {
