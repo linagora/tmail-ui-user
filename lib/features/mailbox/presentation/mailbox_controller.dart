@@ -87,6 +87,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/dashboard_routes.dart';
 import 'package:tmail_ui_user/features/search/mailbox/presentation/search_mailbox_bindings.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/search_query.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/delete_all_permanently_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_trash_folder_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
@@ -310,6 +311,8 @@ class MailboxController extends BaseMailboxController with MailboxActionHandlerM
         } else if (success is MoveAllSelectionAllEmailsAllSuccess) {
           _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
         } else if (success is MoveAllSelectionAllEmailsHasSomeEmailFailure) {
+          _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
+        } else if (success is DeleteAllPermanentlyEmailsSuccess) {
           _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
         }
       });

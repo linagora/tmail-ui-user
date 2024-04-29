@@ -115,6 +115,7 @@ import 'package:tmail_ui_user/features/thread/data/network/thread_api.dart';
 import 'package:tmail_ui_user/features/thread/data/network/thread_isolate_worker.dart';
 import 'package:tmail_ui_user/features/thread/data/repository/thread_repository_impl.dart';
 import 'package:tmail_ui_user/features/thread/domain/repository/thread_repository.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/delete_all_permanently_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/empty_spam_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/empty_trash_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/get_email_by_id_interactor.dart';
@@ -188,6 +189,7 @@ class MailboxDashBoardBindings extends BaseBindings {
       Get.find<GetAllIdentitiesInteractor>(),
       Get.find<MarkAllAsUnreadSelectionAllEmailsInteractor>(),
       Get.find<MoveAllSelectionAllEmailsInteractor>(),
+      Get.find<DeleteAllPermanentlyEmailsInteractor>(),
     ));
     Get.put(AdvancedFilterController());
   }
@@ -369,6 +371,11 @@ class MailboxDashBoardBindings extends BaseBindings {
       Get.find<ThreadRepository>(),
     ));
     Get.lazyPut(() => MoveAllSelectionAllEmailsInteractor(
+      Get.find<EmailRepository>(),
+      Get.find<MailboxRepository>(),
+      Get.find<ThreadRepository>(),
+    ));
+    Get.lazyPut(() => DeleteAllPermanentlyEmailsInteractor(
       Get.find<EmailRepository>(),
       Get.find<MailboxRepository>(),
       Get.find<ThreadRepository>(),
