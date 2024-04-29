@@ -63,6 +63,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/dash
 import 'package:tmail_ui_user/features/search/mailbox/presentation/search_mailbox_bindings.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/search_query.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/delete_all_permanently_emails_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
@@ -179,6 +180,10 @@ class SearchMailboxController extends BaseMailboxController with MailboxActionHa
     } else if (success is MoveAllSelectionAllEmailsHasSomeEmailFailure) {
       _refreshMailboxChanges(mailboxState: success.currentMailboxState);
     } else if (success is DeleteAllPermanentlyEmailsSuccess) {
+      _refreshMailboxChanges(mailboxState: success.currentMailboxState);
+    } else if (success is MarkAllAsStarredSelectionAllEmailsAllSuccess) {
+      _refreshMailboxChanges(mailboxState: success.currentMailboxState);
+    } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
       _refreshMailboxChanges(mailboxState: success.currentMailboxState);
     }
   }

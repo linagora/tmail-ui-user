@@ -34,4 +34,5 @@ enum EmailActionType {
   moveAll,
   moveAllToTrash,
   deleteAllPermanently,
+  markAllAsStarred,
 }

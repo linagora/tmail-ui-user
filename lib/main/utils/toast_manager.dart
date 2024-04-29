@@ -16,6 +16,7 @@ import 'package:tmail_ui_user/features/starting_page/domain/state/sign_in_twake_
 import 'package:tmail_ui_user/features/starting_page/domain/state/sign_up_twake_workplace_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/delete_all_permanently_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
@@ -143,6 +144,18 @@ class ToastManager {
         overlayContext,
         AppLocalizations.of(context).toast_message_empty_trash_folder_success,
       );
+    } else if (success is MarkAllAsStarredSelectionAllEmailsAllSuccess) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsSuccess,
+        leadingSVGIcon: _imagePaths.icUnreadToast,
+      );
+    } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure(success.countStarred),
+        leadingSVGIcon: _imagePaths.icUnreadToast,
+      );
     }
   }
 
@@ -197,6 +210,18 @@ class ToastManager {
         AppLocalizations.of(context).toastMessageDeleteAllPermanentlyEmailsFailureWithReason(
           failure.exception.toString(),
         ),
+      );
+    } else if (failure is MarkAllAsStarredSelectionAllEmailsFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsFailureWithReason(
+          failure.exception.toString(),
+        ),
+      );
+    } else if (failure is MarkAllAsStarredSelectionAllEmailsAllFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsAllFailure,
       );
     }
   }
