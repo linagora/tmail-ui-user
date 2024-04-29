@@ -243,9 +243,12 @@ class ThreadIsolateWorker {
     Session session,
     AccountId accountId,
     MailboxId currentMailboxId,
-    Mailbox destinationMailbox,
+    MailboxId destinationMailboxId,
     int totalEmails,
-    StreamController<dartz.Either<Failure, Success>> onProgressController
+    StreamController<dartz.Either<Failure, Success>> onProgressController,
+    {
+      bool isDestinationSpamMailbox = false
+    }
   ) async {
     List<EmailId> emailIdListCompleted = List.empty(growable: true);
     try {
@@ -290,8 +293,9 @@ class ThreadIsolateWorker {
             session,
             accountId,
             currentMailboxId,
-            destinationMailbox,
+            destinationMailboxId,
             listEmail.listEmailIds,
+            isDestinationSpamMailbox: isDestinationSpamMailbox
           );
           log('ThreadIsolateWorker::moveAllSelectionAllEmails(): MOVED: ${listEmailId.length}');
           emailIdListCompleted.addAll(listEmailId);

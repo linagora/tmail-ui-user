@@ -88,8 +88,11 @@ abstract class ThreadRepository {
     Session session,
     AccountId accountId,
     MailboxId currentMailboxId,
-    Mailbox destinationMailbox,
+    MailboxId destinationMailboxId,
     int totalEmails,
-    StreamController<dartz.Either<Failure, Success>> onProgressController
+    StreamController<dartz.Either<Failure, Success>> onProgressController,
+    {
+      bool isDestinationSpamMailbox = false
+    }
   );
 }
