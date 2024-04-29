@@ -40,98 +40,100 @@ class TopBarThreadSelection extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      TMailButtonWidget.fromIcon(
-        icon: imagePaths.icClose,
-        iconColor: AppColor.primaryColor,
-        tooltipMessage: AppLocalizations.of(context).cancel,
-        backgroundColor: Colors.transparent,
-        iconSize: 28,
-        padding: const EdgeInsets.all(3),
-        onTapActionCallback: onCancelSelection
-      ),
-      if (!isSelectAllEmailsEnabled)
-        Padding(
-          padding: const EdgeInsetsDirectional.only(end: 30),
-          child: Text(
-            AppLocalizations.of(context).count_email_selected(listEmail.length),
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w500,
-              color: AppColor.colorTextButton
-            )
-          ),
-        ),
-      TMailButtonWidget.fromIcon(
-        icon: _getIconForMarkAsRead(),
-        tooltipMessage: _getTooltipMessageForMarkAsRead(context),
-        backgroundColor: Colors.transparent,
-        iconSize: 24,
-        onTapActionCallback: () => onEmailActionTypeAction?.call(
-          List.from(listEmail),
-          _getActionTypeForMarkAsRead()
-        )
-      ),
-      TMailButtonWidget.fromIcon(
-        icon: _getIconForMarkAsStar(),
-        tooltipMessage: _getTooltipMessageForMarkAsStar(context),
-        backgroundColor: Colors.transparent,
-        iconSize: 24,
-        onTapActionCallback: () => onEmailActionTypeAction?.call(
-          List.from(listEmail),
-          _getActionTypeForMarkAsStar()
-        )
-      ),
-    if (canSpamAndMove)
-     ...[
-       TMailButtonWidget.fromIcon(
-         icon: imagePaths.icMove,
-         iconSize: 22,
-         tooltipMessage: _getTooltipMessageForMove(context),
-         backgroundColor: Colors.transparent,
-         onTapActionCallback: () => onEmailActionTypeAction?.call(
-           List.from(listEmail),
-           _getActionTypeForMove()
-         )
-       ),
-       TMailButtonWidget.fromIcon(
-         icon: _getIconForMoveToSpam(),
-         backgroundColor: Colors.transparent,
-         iconSize: 24,
-         tooltipMessage: _getTooltipMessageForMoveToSpam(context),
-         onTapActionCallback: () {
-           onEmailActionTypeAction?.call(
-             List.from(listEmail.listEmailCanSpam(mapMailbox)),
-             _getActionTypeForMoveToSpam()
-           );
-         }
-       )
-      ],
-      if (isAllBelongToTheSameMailbox)
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.5, horizontal: 16),
+      child: Row(children: [
         TMailButtonWidget.fromIcon(
-          icon: imagePaths.icDeleteComposer,
-          backgroundColor: Colors.transparent,
-          iconSize: 20,
-          iconColor: _getIconColorForMoveToTrash(),
-          tooltipMessage: _getTooltipMessageForMoveToTrash(context),
-          onTapActionCallback: () {
-            onEmailActionTypeAction?.call(
-              List.from(listEmail),
-              _getActionTypeForMoveToTrash(),
-            );
-          }
-        ),
-      const Spacer(),
-      if (isSelectAllEmailsEnabled)
-        TMailButtonWidget.fromIcon(
-          icon: imagePaths.icMoreVertical,
-          iconSize: 22,
+          icon: imagePaths.icClose,
           iconColor: AppColor.primaryColor,
-          tooltipMessage: AppLocalizations.of(context).more,
+          tooltipMessage: AppLocalizations.of(context).cancel,
           backgroundColor: Colors.transparent,
-          onTapActionAtPositionCallback: onMoreSelectedEmailAction
+          iconSize: 28,
+          padding: const EdgeInsets.all(3),
+          onTapActionCallback: onCancelSelection
         ),
-    ]);
+        if (!isSelectAllEmailsEnabled)
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 30),
+            child: Text(
+              AppLocalizations.of(context).count_email_selected(listEmail.length),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                color: AppColor.colorTextButton
+              )
+            ),
+          ),
+        TMailButtonWidget.fromIcon(
+          icon: _getIconForMarkAsRead(),
+          tooltipMessage: _getTooltipMessageForMarkAsRead(context),
+          backgroundColor: Colors.transparent,
+          iconSize: 24,
+          onTapActionCallback: () => onEmailActionTypeAction?.call(
+            List.from(listEmail),
+            _getActionTypeForMarkAsRead()
+          )
+        ),
+        TMailButtonWidget.fromIcon(
+          icon: _getIconForMarkAsStar(),
+          tooltipMessage: _getTooltipMessageForMarkAsStar(context),
+          backgroundColor: Colors.transparent,
+          iconSize: 24,
+          onTapActionCallback: () => onEmailActionTypeAction?.call(
+            List.from(listEmail),
+            _getActionTypeForMarkAsStar()
+          )
+        ),
+      if (canSpamAndMove)
+       ...[
+         TMailButtonWidget.fromIcon(
+           icon: imagePaths.icMove,
+           iconSize: 22,
+           tooltipMessage: _getTooltipMessageForMove(context),
+           backgroundColor: Colors.transparent,
+           onTapActionCallback: () => onEmailActionTypeAction?.call(
+             List.from(listEmail),
+             _getActionTypeForMove()
+           )
+         ),
+         TMailButtonWidget.fromIcon(
+           icon: _getIconForMoveToSpam(),
+           backgroundColor: Colors.transparent,
+           iconSize: 24,
+           tooltipMessage: _getTooltipMessageForMoveToSpam(context),
+           onTapActionCallback: () {
+             onEmailActionTypeAction?.call(
+               List.from(listEmail.listEmailCanSpam(mapMailbox)),
+               _getActionTypeForMoveToSpam()
+             );
+           }
+         )
+        ],
+        if (isAllBelongToTheSameMailbox)
+          TMailButtonWidget.fromIcon(
+            icon: imagePaths.icDeleteComposer,
+            backgroundColor: Colors.transparent,
+            iconSize: 20,
+            iconColor: _getIconColorForMoveToTrash(),
+            tooltipMessage: _getTooltipMessageForMoveToTrash(context),
+            onTapActionCallback: () {
+              onEmailActionTypeAction?.call(
+                List.from(listEmail),
+                _getActionTypeForMoveToTrash()
+              );
+            }
+          ),
+        if (isSelectAllEmailsEnabled)
+          TMailButtonWidget.fromIcon(
+            icon: imagePaths.icMoreVertical,
+            iconSize: 22,
+            iconColor: AppColor.primaryColor,
+            tooltipMessage: AppLocalizations.of(context).more,
+            backgroundColor: Colors.transparent,
+            onTapActionAtPositionCallback: onMoreSelectedEmailAction
+          ),
+      ]),
+    );
   }
 
   bool get canDeletePermanently => listEmail.isAllCanDeletePermanently(mapMailbox);
