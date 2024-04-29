@@ -4597,4 +4597,18 @@ class AppLocalizations {
       name: 'markAllAsSpam',
     );
   }
+
+  String get selectAllMailsThatMatchThisSearch {
+    return Intl.message(
+      'Select all mails that match this search',
+      name: 'selectAllMailsThatMatchThisSearch'
+    );
+  }
+
+  String get allMailsInThisSearchAreSelected {
+    return Intl.message(
+      'All mails in this search are selected. ',
+      name: 'allMailsInThisSearchAreSelected'
+    );
+  }
 }

@@ -1409,12 +1409,17 @@ class ThreadController extends BaseController with EmailActionController, PopupM
     }
   }
 
-  bool validateToShowSelectionEmailsBanner() {
+  bool validateToShowSelectionEmailsInMailboxBanner() {
     return mailboxDashBoardController.isSelectAllPageEnabled.isTrue &&
         selectedMailbox != null &&
         selectedMailbox!.countTotalEmails > ThreadConstants.maxCountEmails &&
         mailboxDashBoardController.listEmailSelected.length <
             selectedMailbox!.countTotalEmails;
+  }
+
+  bool validateToShowSelectionEmailsInSearchBanner() {
+    return mailboxDashBoardController.isSelectAllPageEnabled.isTrue
+      && searchController.isSearchEmailRunning;
   }
 
   void showPopupMenuSelectionEmailAction(BuildContext context, RelativeRect position) {

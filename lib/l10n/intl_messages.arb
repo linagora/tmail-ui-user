@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2024-12-10T19:17:47.128720",
+  "@@last_modified": "2024-12-11T09:42:22.623492",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4411,5 +4411,29 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "allUnSpam": "All UnSpam",
+  "@allUnSpam": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "markAllAsSpam": "Mark all as spam",
+  "@markAllAsSpam": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "selectAllMailsThatMatchThisSearch": "Select all mails that match this search",
+  "@selectAllMailsThatMatchThisSearch": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "allMailsInThisSearchAreSelected": "All mails in this search are selected. ",
+  "@allMailsInThisSearchAreSelected": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
   }
 }
