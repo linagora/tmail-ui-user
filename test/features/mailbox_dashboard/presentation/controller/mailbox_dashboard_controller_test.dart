@@ -84,6 +84,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/empty_trash_folder
 import 'package:tmail_ui_user/features/thread/domain/usecases/get_email_by_id_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/get_emails_in_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/load_more_emails_in_mailbox_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
@@ -176,6 +177,7 @@ const fallbackGenerators = {
   MockSpec<ToastManager>(),
   MockSpec<GetAllIdentitiesInteractor>(),
   MockSpec<GetIdentityCacheOnWebInteractor>(),
+  MockSpec<MarkAllAsUnreadSelectionAllEmailsInteractor>(),
 ])
 void main() {
   // mock mailbox dashboard controller direct dependencies
@@ -260,6 +262,7 @@ void main() {
   final refreshAllMailboxInteractor = MockRefreshAllMailboxInteractor();
   final removeComposerCacheOnWebInteractor = MockRemoveComposerCacheOnWebInteractor();
   final getAllIdentitiesInteractor = MockGetAllIdentitiesInteractor();
+  final markAllAsUnreadSelectionAllEmailsInteractor = MockMarkAllAsUnreadSelectionAllEmailsInteractor();
   late MailboxController mailboxController;
 
   // mock thread controller direct dependencies
@@ -310,6 +313,7 @@ void main() {
     Get.put<UpdateAccountCacheInteractor>(updateAccountCacheInteractor);
     Get.put<GetAllIdentitiesInteractor>(getAllIdentitiesInteractor);
     Get.put<RemoveComposerCacheOnWebInteractor>(removeComposerCacheOnWebInteractor);
+    Get.put<MarkAllAsUnreadSelectionAllEmailsInteractor>(markAllAsUnreadSelectionAllEmailsInteractor);
 
     searchController = SearchController(
       quickSearchEmailInteractor,
@@ -345,6 +349,7 @@ void main() {
       getRestoredDeletedMessageInteractor,
       removeComposerCacheOnWebInteractor,
       getAllIdentitiesInteractor,
+      markAllAsUnreadSelectionAllEmailsInteractor,
     );
   });
 

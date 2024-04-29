@@ -1,5 +1,9 @@
 
+import 'dart:async';
+
 import 'package:core/data/model/source_type/data_source_type.dart';
+import 'package:core/presentation/state/failure.dart';
+import 'package:core/presentation/state/success.dart';
 import 'package:core/utils/app_logger.dart';
 import 'package:dartz/dartz.dart' as dartz;
 import 'package:jmap_dart_client/jmap/account_id.dart';
@@ -407,5 +411,22 @@ class ThreadRepositoryImpl extends ThreadRepository {
       newDestroyed: listEmailIdDeleted);
 
     return listEmailIdDeleted;
+  }
+
+  @override
+  Future<List<EmailId>> markAllAsUnreadForSelectionAllEmails(
+    Session session,
+    AccountId accountId,
+    MailboxId mailboxId,
+    int totalEmailRead,
+    StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) {
+    return mapDataSource[DataSourceType.network]!.markAllAsUnreadForSelectionAllEmails(
+      session,
+      accountId,
+      mailboxId,
+      totalEmailRead,
+      onProgressController
+    );
   }
 }

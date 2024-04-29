@@ -61,6 +61,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/empty_trash_folder_st
 import 'package:tmail_ui_user/features/thread/domain/state/get_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/get_email_by_id_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/load_more_emails_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_star_multiple_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
@@ -401,6 +402,10 @@ class ThreadController extends BaseController with EmailActionController, PopupM
         } else if (success is UnsubscribeEmailSuccess) {
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is StoreEventAttendanceStatusSuccess) {
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MarkAllAsUnreadSelectionAllEmailsAllSuccess) {
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure) {
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         }
       });
@@ -1378,7 +1383,7 @@ class ThreadController extends BaseController with EmailActionController, PopupM
   void showPopupMenuSelectionEmailAction(BuildContext context, RelativeRect position) {
     final listSelectionEmailActions = [
       EmailActionType.markAllAsRead,
-      EmailActionType.markAsUnread,
+      EmailActionType.markAllAsUnread,
       EmailActionType.moveToMailbox,
       EmailActionType.moveToTrash,
     ];
@@ -1460,7 +1465,17 @@ class ThreadController extends BaseController with EmailActionController, PopupM
           _accountId!,
           selectedMailbox.mailboxId!,
           selectedMailbox.getDisplayName(context),
-          selectedMailbox.unreadEmails?.value.value.toInt() ?? 0
+          selectedMailbox.countUnreadEmails
+        );
+        break;
+      case EmailActionType.markAllAsUnread:
+        cancelSelectEmail();
+        mailboxDashBoardController.markAllAsUnreadSelectionAllEmails(
+          _session!,
+          _accountId!,
+          selectedMailbox.mailboxId!,
+          selectedMailbox.getDisplayName(context),
+          selectedMailbox.countReadEmails
         );
         break;
       default:

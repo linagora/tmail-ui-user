@@ -118,6 +118,7 @@ import 'package:tmail_ui_user/features/thread/domain/repository/thread_repositor
 import 'package:tmail_ui_user/features/thread/domain/usecases/empty_spam_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/empty_trash_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/get_email_by_id_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
@@ -184,6 +185,7 @@ class MailboxDashBoardBindings extends BaseBindings {
       Get.find<GetRestoredDeletedMessageInterator>(),
       Get.find<RemoveComposerCacheOnWebInteractor>(),
       Get.find<GetAllIdentitiesInteractor>(),
+      Get.find<MarkAllAsUnreadSelectionAllEmailsInteractor>(),
     ));
     Get.put(AdvancedFilterController());
   }
@@ -358,6 +360,11 @@ class MailboxDashBoardBindings extends BaseBindings {
     ));
     Get.lazyPut(() => GetIdentityCacheOnWebInteractor(
       Get.find<IdentityCreatorRepository>()
+    ));
+    Get.lazyPut(() => MarkAllAsUnreadSelectionAllEmailsInteractor(
+      Get.find<MailboxRepository>(),
+      Get.find<EmailRepository>(),
+      Get.find<ThreadRepository>(),
     ));
   }
 
