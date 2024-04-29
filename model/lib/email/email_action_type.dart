@@ -35,4 +35,6 @@ enum EmailActionType {
   moveAllToTrash,
   deleteAllPermanently,
   markAllAsStarred,
+  markAllAsSpam,
+  allUnSpam,
 }
