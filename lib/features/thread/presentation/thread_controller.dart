@@ -64,6 +64,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/load_more_emails_stat
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_star_multiple_email_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/refresh_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/refresh_changes_all_email_state.dart';
@@ -378,8 +379,14 @@ class ThreadController extends BaseController with EmailActionController, PopupM
         } else if (success is UpdateEmailDraftsSuccess) {
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is MarkAsMailboxReadAllSuccess) {
+          if (success.mailboxId == selectedMailbox?.id) {
+            cancelSelectEmail();
+          }
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is MarkAsMailboxReadHasSomeEmailFailure) {
+          if (success.mailboxId == selectedMailbox?.id) {
+            cancelSelectEmail();
+          }
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is MoveMultipleEmailToMailboxAllSuccess) {
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
@@ -404,8 +411,16 @@ class ThreadController extends BaseController with EmailActionController, PopupM
         } else if (success is StoreEventAttendanceStatusSuccess) {
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is MarkAllAsUnreadSelectionAllEmailsAllSuccess) {
+          cancelSelectEmail();
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure) {
+          cancelSelectEmail();
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MoveAllSelectionAllEmailsAllSuccess) {
+          cancelSelectEmail();
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MoveAllSelectionAllEmailsHasSomeEmailFailure) {
+          cancelSelectEmail();
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         }
       });
@@ -1372,19 +1387,17 @@ class ThreadController extends BaseController with EmailActionController, PopupM
 
   bool validateToShowSelectionEmailsBanner() {
     return mailboxDashBoardController.isSelectionEnabled() &&
-        mailboxDashBoardController.selectedMailbox.value != null &&
-        mailboxDashBoardController.selectedMailbox.value!.totalEmails != null &&
+        selectedMailbox != null &&
+        selectedMailbox!.totalEmails != null &&
         mailboxDashBoardController.listEmailSelected.length <
-            mailboxDashBoardController
-                .selectedMailbox.value!.totalEmails!.value.value
-                .toInt();
+            selectedMailbox!.countTotalEmails;
   }
 
   void showPopupMenuSelectionEmailAction(BuildContext context, RelativeRect position) {
     final listSelectionEmailActions = [
       EmailActionType.markAllAsRead,
       EmailActionType.markAllAsUnread,
-      EmailActionType.moveToMailbox,
+      EmailActionType.moveAll,
       EmailActionType.moveToTrash,
     ];
 
@@ -1459,7 +1472,6 @@ class ThreadController extends BaseController with EmailActionController, PopupM
 
     switch(actionType) {
       case EmailActionType.markAllAsRead:
-        cancelSelectEmail();
         mailboxDashBoardController.markAsReadMailbox(
           _session!,
           _accountId!,
@@ -1469,13 +1481,20 @@ class ThreadController extends BaseController with EmailActionController, PopupM
         );
         break;
       case EmailActionType.markAllAsUnread:
-        cancelSelectEmail();
         mailboxDashBoardController.markAllAsUnreadSelectionAllEmails(
           _session!,
           _accountId!,
           selectedMailbox.mailboxId!,
           selectedMailbox.getDisplayName(context),
           selectedMailbox.countReadEmails
+        );
+        break;
+      case EmailActionType.moveAll:
+        mailboxDashBoardController.moveAllSelectionAllEmails(
+          context,
+          _session!,
+          _accountId!,
+          selectedMailbox,
         );
         break;
       default:

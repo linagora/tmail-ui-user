@@ -148,6 +148,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/get_email_by_id_state
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_star_multiple_email_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/refresh_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/empty_spam_folder_interactor.dart';
@@ -156,6 +157,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/get_email_by_id_in
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/presentation/model/delete_action_type.dart';
 import 'package:tmail_ui_user/main/deep_links/deep_link_data.dart';
@@ -210,6 +212,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   final RemoveComposerCacheOnWebInteractor _removeComposerCacheOnWebInteractor;
   final GetAllIdentitiesInteractor _getAllIdentitiesInteractor;
   final MarkAllAsUnreadSelectionAllEmailsInteractor _markAllAsUnreadSelectionAllEmailsInteractor;
+  final MoveAllSelectionAllEmailsInteractor _moveAllSelectionAllEmailsInteractor;
 
   GetAllVacationInteractor? _getAllVacationInteractor;
   UpdateVacationInteractor? _updateVacationInteractor;
@@ -245,6 +248,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   final localFileDraggableAppState = Rxn<DraggableAppState>();
   final isSelectAllEmailsEnabled = RxBool(false);
   final markAllAsUnreadSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
+  final moveAllSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
 
   Session? sessionCurrent;
   Map<Role, MailboxId> mapDefaultMailboxIdByRole = {};
@@ -264,12 +268,15 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   late StreamSubscription _markAsReadMailboxStreamSubscription;
   late StreamSubscription _refreshActionStreamSubscription;
   late StreamSubscription _markAllAsUnreadSelectionAllEmailsStreamSubscription;
+  late StreamSubscription _moveAllSelectionAllEmailsStreamSubscription;
 
   final StreamController<Either<Failure, Success>> _markAsReadMailboxStreamController =
     StreamController<Either<Failure, Success>>.broadcast();
   final StreamController<RefreshActionViewEvent> _refreshActionEventController =
     StreamController<RefreshActionViewEvent>.broadcast();
   final StreamController<Either<Failure, Success>> _markAllAsUnreadSelectionAllEmailsStreamController =
+    StreamController<Either<Failure, Success>>.broadcast();
+  final StreamController<Either<Failure, Success>> _moveAllSelectionAllEmailsStreamController =
     StreamController<Either<Failure, Success>>.broadcast();
 
   final _notificationManager = LocalNotificationManager.instance;
@@ -302,6 +309,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     this._removeComposerCacheOnWebInteractor,
     this._getAllIdentitiesInteractor,
     this._markAllAsUnreadSelectionAllEmailsInteractor,
+    this._moveAllSelectionAllEmailsInteractor,
   );
 
   @override
@@ -427,6 +435,9 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     } else if (success is MarkAllAsUnreadSelectionAllEmailsAllSuccess
       || success is MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure) {
       _handleMarkAllAsUnreadSelectionAllEmailsSuccess(success);
+    } else if (success is MoveAllSelectionAllEmailsAllSuccess
+      || success is MoveAllSelectionAllEmailsHasSomeEmailFailure) {
+      _handleMoveAllSelectionAllEmailsSuccess(success);
     }
   }
 
@@ -458,6 +469,9 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     } else if (failure is MarkAllAsUnreadSelectionAllEmailsFailure
       || failure is MarkAllAsUnreadSelectionAllEmailsAllFailure) {
       _handleMarkAllAsUnreadSelectionAllEmailsFailure(failure);
+    } else if (failure is MoveAllSelectionAllEmailsFailure
+      || failure is MoveAllSelectionAllEmailsAllFailure) {
+      _handleMoveAllSelectionAllEmailsFailure(failure);
     }
   }
 
@@ -649,6 +663,10 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
 
     _markAllAsUnreadSelectionAllEmailsStreamSubscription = _markAllAsUnreadSelectionAllEmailsStreamController.stream.listen((state) {
       markAllAsUnreadSelectionAllEmailsViewState.value = state;
+    });
+
+    _moveAllSelectionAllEmailsStreamSubscription = _moveAllSelectionAllEmailsStreamController.stream.listen((state) {
+      moveAllSelectionAllEmailsViewState.value = state;
     });
 
     _registerLocalNotificationStreamListener();
@@ -3046,6 +3064,61 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     );
   }
 
+  Future<void> moveAllSelectionAllEmails(
+    BuildContext context,
+    Session session,
+    AccountId accountId,
+    PresentationMailbox currentMailbox
+  ) async {
+    final arguments = DestinationPickerArguments(
+      accountId,
+      MailboxActions.moveEmail,
+      session,
+      mailboxIdSelected: currentMailbox.id);
+
+    final destinationMailbox = PlatformInfo.isWeb
+      ? await DialogRouter.pushGeneralDialog(
+          routeName: AppRoutes.destinationPicker,
+          arguments: arguments)
+      : await push(AppRoutes.destinationPicker, arguments: arguments);
+
+    if (destinationMailbox is PresentationMailbox) {
+      consumeState(_moveAllSelectionAllEmailsInteractor.execute(
+        session,
+        accountId,
+        currentMailbox.id,
+        destinationMailbox.toMailbox(),
+        destinationMailbox.mailboxPath ?? (context.mounted ? destinationMailbox.getDisplayName(context) : ''),
+        currentMailbox.countTotalEmails,
+        _moveAllSelectionAllEmailsStreamController,
+      ));
+    }
+  }
+
+  void _handleMoveAllSelectionAllEmailsSuccess(Success success) {
+    moveAllSelectionAllEmailsViewState.value = Right(UIState.idle);
+
+    if (currentContext == null || currentOverlayContext == null) return;
+
+    toastManager.showSuccessMessage(
+      context: currentContext!,
+      overlayContext: currentOverlayContext!,
+      success: success,
+    );
+  }
+
+  void _handleMoveAllSelectionAllEmailsFailure(Failure failure) {
+    moveAllSelectionAllEmailsViewState.value = Right(UIState.idle);
+
+    if (currentContext == null || currentOverlayContext == null) return;
+
+    toastManager.showFailureMessage(
+      context: currentContext!,
+      overlayContext: currentOverlayContext!,
+      failure: failure,
+    );
+  }
+
   @override
   void onClose() {
     if (PlatformInfo.isWeb) {
@@ -3067,6 +3140,8 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     _refreshActionEventController.close();
     _markAllAsUnreadSelectionAllEmailsStreamSubscription.cancel();
     _markAllAsUnreadSelectionAllEmailsStreamController.close();
+    _moveAllSelectionAllEmailsStreamSubscription.cancel();
+    _moveAllSelectionAllEmailsStreamController.close();
     _notificationManager.closeStream();
     _fcmService.closeStream();
     applicationManager.releaseUserAgent();

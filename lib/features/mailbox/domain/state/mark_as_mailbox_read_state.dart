@@ -23,9 +23,12 @@ class UpdatingMarkAsMailboxReadState extends UIState {
 
 class MarkAsMailboxReadAllSuccess extends UIActionState {
 
+  final MailboxId mailboxId;
   final String mailboxDisplayName;
 
-  MarkAsMailboxReadAllSuccess(this.mailboxDisplayName,
+  MarkAsMailboxReadAllSuccess(
+    this.mailboxId,
+    this.mailboxDisplayName,
     {
       jmap.State? currentEmailState,
       jmap.State? currentMailboxState,
@@ -34,6 +37,7 @@ class MarkAsMailboxReadAllSuccess extends UIActionState {
 
   @override
   List<Object?> get props => [
+    mailboxId,
     mailboxDisplayName,
     ...super.props
   ];
@@ -41,10 +45,12 @@ class MarkAsMailboxReadAllSuccess extends UIActionState {
 
 class MarkAsMailboxReadHasSomeEmailFailure extends UIActionState {
 
+  final MailboxId mailboxId;
   final String mailboxDisplayName;
   final int countEmailsRead;
 
   MarkAsMailboxReadHasSomeEmailFailure(
+    this.mailboxId,
     this.mailboxDisplayName,
     this.countEmailsRead,
     {
@@ -55,6 +61,7 @@ class MarkAsMailboxReadHasSomeEmailFailure extends UIActionState {
 
   @override
   List<Object?> get props => [
+    mailboxId,
     mailboxDisplayName,
     countEmailsRead,
     ...super.props

@@ -52,6 +52,7 @@ import 'package:model/extensions/email_id_extensions.dart';
 import 'package:model/extensions/keyword_identifier_extension.dart';
 import 'package:model/extensions/list_email_extension.dart';
 import 'package:model/extensions/list_email_id_extension.dart';
+import 'package:model/extensions/mailbox_extension.dart';
 import 'package:model/extensions/mailbox_id_extension.dart';
 import 'package:model/extensions/session_extension.dart';
 import 'package:model/oidc/token_oidc.dart';
@@ -828,6 +829,46 @@ class EmailAPI with HandleSetErrorMixin {
       return listEmails.first;
     } else {
       throw NotFoundEmailException();
+    }
+  }
+
+  Future<List<EmailId>> moveSelectionAllEmailsToFolder(
+    Session session,
+    AccountId accountId,
+    MailboxId currentMailboxId,
+    Mailbox destinationMailbox,
+    List<EmailId> listEmailId,
+  ) async {
+    final moveProperties = destinationMailbox.isSpam
+      ? listEmailId.generateMapUpdateObjectMoveToSpam(currentMailboxId, destinationMailbox.id!)
+      : listEmailId.generateMapUpdateObjectMoveToMailbox(currentMailboxId, destinationMailbox.id!);
+
+    final setEmailMethod = SetEmailMethod(accountId)
+      ..addUpdates(moveProperties);
+
+    final requestBuilder = JmapRequestBuilder(_httpClient, ProcessingInvocation());
+    final setEmailInvocation = requestBuilder.invocation(setEmailMethod);
+
+    final capabilities = setEmailMethod.requiredCapabilities
+      .toCapabilitiesSupportTeamMailboxes(session, accountId);
+
+    final response = await (requestBuilder..usings(capabilities))
+      .build()
+      .execute();
+
+    final setEmailResponse = response.parse<SetEmailResponse>(
+      setEmailInvocation.methodCallId,
+      SetEmailResponse.deserialize
+    );
+
+    final listIdUpdated = setEmailResponse?.updated?.keys.toList();
+    final mapErrors = handleSetResponse([setEmailResponse]);
+
+    if (listIdUpdated != null && mapErrors.isEmpty) {
+      final listEmailIdUpdated = listIdUpdated.map((id) => EmailId(id)).toList();
+      return listEmailIdUpdated;
+    } else {
+      throw SetMethodException(mapErrors);
     }
   }
 }
