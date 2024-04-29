@@ -1,17 +1,24 @@
 import 'dart:async';
 
+import 'package:core/presentation/state/failure.dart';
+import 'package:core/presentation/state/success.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:core/utils/app_logger.dart';
 import 'package:core/utils/platform_info.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/properties/properties.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:jmap_dart_client/jmap/core/sort/comparator.dart';
+import 'package:jmap_dart_client/jmap/core/unsigned_int.dart';
+import 'package:jmap_dart_client/jmap/core/utc_date.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email_comparator.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email_comparator_property.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email_filter_condition.dart';
+import 'package:jmap_dart_client/jmap/mail/email/keyword_identifier.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:model/email/email_property.dart';
+import 'package:model/email/read_actions.dart';
 import 'package:model/extensions/list_email_extension.dart';
 import 'package:tmail_ui_user/features/base/isolate/background_isolate_binary_messenger/background_isolate_binary_messenger.dart';
 import 'package:tmail_ui_user/features/caching/config/hive_cache_config.dart';
@@ -19,6 +26,8 @@ import 'package:tmail_ui_user/features/email/data/network/email_api.dart';
 import 'package:tmail_ui_user/features/thread/data/model/empty_mailbox_folder_arguments.dart';
 import 'package:tmail_ui_user/features/thread/data/network/thread_api.dart';
 import 'package:tmail_ui_user/features/thread/domain/exceptions/thread_exceptions.dart';
+import 'package:tmail_ui_user/features/thread/domain/model/email_response.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/exceptions/isolate_exception.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -157,5 +166,76 @@ class ThreadIsolateWorker {
     }
     log('ThreadIsolateWorker::_emptyMailboxFolderOnWeb(): TOTAL_REMOVE: ${emailListCompleted.length}');
     return emailListCompleted;
+  }
+
+  Future<List<EmailId>> markAllAsUnreadForSelectionAllEmails(
+    Session session,
+    AccountId accountId,
+    MailboxId mailboxId,
+    int totalEmailRead,
+    StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) async {
+    List<EmailId> emailIdListCompleted = List.empty(growable: true);
+    try {
+      bool mailboxHasEmails = true;
+      UTCDate? lastReceivedDate;
+      EmailId? lastEmailId;
+
+      while (mailboxHasEmails) {
+        final emailResponse = await _threadAPI.getAllEmail(
+          session,
+          accountId,
+          limit: UnsignedInt(30),
+          filter: EmailFilterCondition(
+            inMailbox: mailboxId,
+            hasKeyword: KeyWordIdentifier.emailSeen.value,
+            before: lastReceivedDate
+          ),
+          sort: <Comparator>{}..add(
+            EmailComparator(EmailComparatorProperty.receivedAt)..setIsAscending(false)
+          ),
+          properties: Properties({
+            EmailProperty.id,
+            EmailProperty.receivedAt,
+          })
+        ).then((response) {
+          var listEmails = response.emailList;
+          if (listEmails != null && listEmails.isNotEmpty && lastEmailId != null) {
+            listEmails = listEmails
+              .where((email) => email.id != lastEmailId)
+              .toList();
+          }
+          return EmailsResponse(emailList: listEmails, state: response.state);
+        });
+        final listEmailRead = emailResponse.emailList;
+        log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails: LIST_EMAIL_READ = ${listEmailRead?.length}');
+        if (listEmailRead == null || listEmailRead.isEmpty) {
+          mailboxHasEmails = false;
+        } else {
+          lastEmailId = listEmailRead.last.id;
+          lastReceivedDate = listEmailRead.last.receivedAt;
+
+          final listEmailId = await _emailAPI.markAsRead(
+            session,
+            accountId,
+            listEmailRead,
+            ReadActions.markAsUnread
+          );
+          log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails(): MARK_UNREAD: ${listEmailId.length}');
+          emailIdListCompleted.addAll(listEmailId);
+          onProgressController.add(
+            dartz.Right(MarkAllAsUnreadSelectionAllEmailsUpdating(
+              mailboxId: mailboxId,
+              totalRead: totalEmailRead,
+              countUnread: emailIdListCompleted.length
+            ))
+          );
+        }
+      }
+    } catch (e) {
+      log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails(): ERROR: $e');
+    }
+    log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails(): TOTAL_UNREAD: ${emailIdListCompleted.length}');
+    return emailIdListCompleted;
   }
 }

@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:core/presentation/state/failure.dart';
+import 'package:core/presentation/state/success.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/filter/filter.dart';
 import 'package:jmap_dart_client/jmap/core/properties/properties.dart';
@@ -131,6 +134,25 @@ class ThreadDataSourceImpl extends ThreadDataSource {
     return Future.sync(() async {
       final email = await threadAPI.getEmailById(session, accountId, emailId, properties: properties);
       return email.toPresentationEmail();
+    }).catchError(_exceptionThrower.throwException);
+  }
+
+  @override
+  Future<List<EmailId>> markAllAsUnreadForSelectionAllEmails(
+    Session session,
+    AccountId accountId,
+    MailboxId mailboxId,
+    int totalEmailRead,
+    StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) {
+    return Future.sync(() async {
+      return await _threadIsolateWorker.markAllAsUnreadForSelectionAllEmails(
+        session,
+        accountId,
+        mailboxId,
+        totalEmailRead,
+        onProgressController
+      );
     }).catchError(_exceptionThrower.throwException);
   }
 }

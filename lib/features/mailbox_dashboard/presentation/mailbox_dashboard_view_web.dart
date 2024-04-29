@@ -25,6 +25,8 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/styles/mai
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/download/download_task_item_widget.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/mark_mailbox_as_read_loading_banner.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/navigation_bar/navigation_bar_widget.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/loading/mark_all_as_unread_selection_all_emails_loading_widget.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/loading/mark_mailbox_as_read_loading_widget.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/recover_deleted_message_loading_banner_widget.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/search_filters/filter_message_button.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/search_filters/search_filter_button.dart';
@@ -133,6 +135,8 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
                           }
                         }),
                         _buildListButtonQuickSearchFilter(context),
+                        Obx(() => MarkMailboxAsReadLoadingWidget(viewState: controller.viewStateMarkAsReadMailbox.value)),
+                        Obx(() => MarkAllAsUnreadSelectionAllEmailsLoadingWidget(viewState: controller.markAllAsUnreadSelectionAllEmailsViewState.value)),
                         Expanded(child: Obx(() {
                           switch(controller.dashboardRoute.value) {
                             case DashboardRoutes.thread:

@@ -4,28 +4,29 @@ import 'package:jmap_dart_client/jmap/core/state.dart' as jmap;
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:tmail_ui_user/features/base/state/ui_action_state.dart';
 
-class MarkAsMailboxReadLoading extends LoadingState {}
+class MarkAllAsUnreadSelectionAllEmailsLoading extends LoadingState {}
 
-class UpdatingMarkAsMailboxReadState extends UIState {
+class MarkAllAsUnreadSelectionAllEmailsUpdating extends UIState {
 
   final MailboxId mailboxId;
-  final int totalUnread;
-  final int countRead;
+  final int totalRead;
+  final int countUnread;
 
-  UpdatingMarkAsMailboxReadState({
+  MarkAllAsUnreadSelectionAllEmailsUpdating({
     required this.mailboxId,
-    required this.totalUnread,
-    required this.countRead});
+    required this.totalRead,
+    required this.countUnread
+  });
 
   @override
-  List<Object?> get props => [mailboxId, countRead, totalUnread];
+  List<Object?> get props => [mailboxId, totalRead, countUnread];
 }
 
-class MarkAsMailboxReadAllSuccess extends UIActionState {
+class MarkAllAsUnreadSelectionAllEmailsAllSuccess extends UIActionState {
 
   final String mailboxDisplayName;
 
-  MarkAsMailboxReadAllSuccess(this.mailboxDisplayName,
+  MarkAllAsUnreadSelectionAllEmailsAllSuccess(this.mailboxDisplayName,
     {
       jmap.State? currentEmailState,
       jmap.State? currentMailboxState,
@@ -39,14 +40,14 @@ class MarkAsMailboxReadAllSuccess extends UIActionState {
   ];
 }
 
-class MarkAsMailboxReadHasSomeEmailFailure extends UIActionState {
+class MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure extends UIActionState {
 
   final String mailboxDisplayName;
-  final int countEmailsRead;
+  final int countEmailsUnread;
 
-  MarkAsMailboxReadHasSomeEmailFailure(
+  MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure(
     this.mailboxDisplayName,
-    this.countEmailsRead,
+    this.countEmailsUnread,
     {
       jmap.State? currentEmailState,
       jmap.State? currentMailboxState,
@@ -56,25 +57,25 @@ class MarkAsMailboxReadHasSomeEmailFailure extends UIActionState {
   @override
   List<Object?> get props => [
     mailboxDisplayName,
-    countEmailsRead,
+    countEmailsUnread,
     ...super.props
   ];
 }
 
-class MarkAsMailboxReadAllFailure extends FeatureFailure {
+class  MarkAllAsUnreadSelectionAllEmailsAllFailure extends FeatureFailure {
   final String mailboxDisplayName;
 
-  MarkAsMailboxReadAllFailure({required this.mailboxDisplayName});
+  MarkAllAsUnreadSelectionAllEmailsAllFailure({required this.mailboxDisplayName});
 
   @override
   List<Object?> get props => [mailboxDisplayName];
 }
 
-class MarkAsMailboxReadFailure extends FeatureFailure {
+class MarkAllAsUnreadSelectionAllEmailsFailure extends FeatureFailure {
 
   final String mailboxDisplayName;
 
-  MarkAsMailboxReadFailure({
+  MarkAllAsUnreadSelectionAllEmailsFailure({
     required this.mailboxDisplayName,
     dynamic exception
   }) : super(exception: exception);

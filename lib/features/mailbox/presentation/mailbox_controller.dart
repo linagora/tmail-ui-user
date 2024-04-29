@@ -91,6 +91,7 @@ import 'package:tmail_ui_user/features/search/mailbox/presentation/search_mailbo
 import 'package:tmail_ui_user/features/thread/domain/model/search_query.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_trash_folder_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
@@ -304,6 +305,10 @@ class MailboxController extends BaseMailboxController
           _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
         } else if (success is GetRestoredDeletedMessageSuccess) {
           _refreshMailboxChanges(properties: MailboxConstants.propertiesDefault);
+        } else if (success is MarkAllAsUnreadSelectionAllEmailsAllSuccess) {
+          _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
+        } else if (success is MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure) {
+          _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
         }
       });
     });

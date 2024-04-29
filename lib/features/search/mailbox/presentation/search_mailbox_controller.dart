@@ -62,6 +62,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/dashboard_routes.dart';
 import 'package:tmail_ui_user/features/search/mailbox/presentation/search_mailbox_bindings.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/search_query.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 import 'package:tmail_ui_user/main/routes/app_routes.dart';
 import 'package:tmail_ui_user/main/routes/dialog_router.dart';
@@ -167,6 +168,10 @@ class SearchMailboxController extends BaseMailboxController with MailboxActionHa
       _handleSubscribeMultipleMailboxHasSomeSuccess(success);
     } else if (success is CreateNewMailboxSuccess) {
       _createNewMailboxSuccess(success);
+    } else if (success is MarkAllAsUnreadSelectionAllEmailsAllSuccess) {
+      _refreshMailboxChanges(mailboxState: success.currentMailboxState);
+    } else if (success is MarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure) {
+      _refreshMailboxChanges(mailboxState: success.currentMailboxState);
     }
   }
 

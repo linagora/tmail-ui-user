@@ -30,4 +30,5 @@ enum EmailActionType {
   printAll,
   downloadMessageAsEML,
   markAllAsRead,
+  markAllAsUnread,
 }
