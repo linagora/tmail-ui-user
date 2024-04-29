@@ -766,6 +766,12 @@ class ThreadController extends BaseController with EmailActionController, PopupM
   }
 
   void selectEmail(PresentationEmail presentationEmailSelected) {
+    if (mailboxDashBoardController.isSelectAllPageEnabled.value) {
+      mailboxDashBoardController.isSelectAllPageEnabled.value = false;
+    }
+    if (mailboxDashBoardController.isSelectAllEmailsEnabled.value) {
+      mailboxDashBoardController.isSelectAllEmailsEnabled.value = false;
+    }
     final emailsInCurrentMailbox = mailboxDashBoardController.emailsInCurrentMailbox;
 
     if (_rangeSelectionMode && latestEmailSelectedOrUnselected.value != null && latestEmailSelectedOrUnselected.value?.id != presentationEmailSelected.id) {
@@ -817,6 +823,7 @@ class ThreadController extends BaseController with EmailActionController, PopupM
       .map((email) => email.toSelectedEmail(selectMode: SelectMode.INACTIVE))
       .toList();
     mailboxDashBoardController.isSelectAllEmailsEnabled.value = false;
+    mailboxDashBoardController.isSelectAllPageEnabled.value = false;
     mailboxDashBoardController.updateEmailList(newEmailList);
     mailboxDashBoardController.currentSelectMode.value = SelectMode.INACTIVE;
     mailboxDashBoardController.listEmailSelected.clear();
@@ -1389,6 +1396,12 @@ class ThreadController extends BaseController with EmailActionController, PopupM
 
   void handleLoadMoreEmailsRequest() {
     log('ThreadController::handleLoadMoreEmailsRequest:');
+    if (mailboxDashBoardController.isSelectAllPageEnabled.value) {
+      mailboxDashBoardController.isSelectAllPageEnabled.value = false;
+    }
+    if (mailboxDashBoardController.isSelectAllEmailsEnabled.value) {
+      mailboxDashBoardController.isSelectAllEmailsEnabled.value = false;
+    }
     if (isSearchActive) {
       _searchMoreEmails();
     } else  {
@@ -1397,7 +1410,7 @@ class ThreadController extends BaseController with EmailActionController, PopupM
   }
 
   bool validateToShowSelectionEmailsBanner() {
-    return mailboxDashBoardController.isSelectionEnabled() &&
+    return mailboxDashBoardController.isSelectAllPageEnabled.isTrue &&
         selectedMailbox != null &&
         selectedMailbox!.countTotalEmails > ThreadConstants.maxCountEmails &&
         mailboxDashBoardController.listEmailSelected.length <

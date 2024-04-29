@@ -249,7 +249,6 @@ class TopBarThreadSelection extends StatelessWidget{
     }
   }
 
-
   EmailActionType _getActionTypeForMarkAsStar() {
     if (isSelectAllEmailsEnabled) {
       return EmailActionType.markAllAsStarred;

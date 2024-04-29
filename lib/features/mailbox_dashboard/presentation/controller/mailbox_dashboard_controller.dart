@@ -253,6 +253,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   final isRecoveringDeletedMessage = RxBool(false);
   final localFileDraggableAppState = Rxn<DraggableAppState>();
   final isSelectAllEmailsEnabled = RxBool(false);
+  final isSelectAllPageEnabled = RxBool(false);
   final markAllAsUnreadSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final moveAllSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final deleteAllPermanentlyEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
@@ -2626,6 +2627,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   }
 
   void selectAllEmailAction() {
+    isSelectAllPageEnabled.value = true;
     dispatchAction(SelectionAllEmailAction());
   }
 
