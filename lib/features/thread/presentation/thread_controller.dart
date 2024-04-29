@@ -62,6 +62,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/empty_trash_folder_st
 import 'package:tmail_ui_user/features/thread/domain/state/get_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/get_email_by_id_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/load_more_emails_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_star_multiple_email_state.dart';
@@ -424,6 +425,12 @@ class ThreadController extends BaseController with EmailActionController, PopupM
           cancelSelectEmail();
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         } else if (success is DeleteAllPermanentlyEmailsSuccess) {
+          cancelSelectEmail();
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MarkAllAsStarredSelectionAllEmailsAllSuccess) {
+          cancelSelectEmail();
+          _refreshEmailChanges(currentEmailState: success.currentEmailState);
+        } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
           cancelSelectEmail();
           _refreshEmailChanges(currentEmailState: success.currentEmailState);
         }
@@ -1520,6 +1527,15 @@ class ThreadController extends BaseController with EmailActionController, PopupM
           _session!,
           _accountId!,
           selectedMailbox,
+        );
+        break;
+      case EmailActionType.markAllAsStarred:
+        mailboxDashBoardController.markAllAsStarredSelectionAllEmails(
+          _session!,
+          _accountId!,
+          selectedMailbox.mailboxId!,
+          selectedMailbox.getDisplayName(context),
+          selectedMailbox.countTotalEmails
         );
         break;
       default:

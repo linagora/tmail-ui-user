@@ -18,6 +18,7 @@ import 'package:jmap_dart_client/jmap/mail/email/email_filter_condition.dart';
 import 'package:jmap_dart_client/jmap/mail/email/keyword_identifier.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:model/email/email_property.dart';
+import 'package:model/email/mark_star_action.dart';
 import 'package:model/email/read_actions.dart';
 import 'package:model/extensions/list_email_extension.dart';
 import 'package:tmail_ui_user/features/base/isolate/background_isolate_binary_messenger/background_isolate_binary_messenger.dart';
@@ -27,6 +28,7 @@ import 'package:tmail_ui_user/features/thread/data/model/empty_mailbox_folder_ar
 import 'package:tmail_ui_user/features/thread/data/network/thread_api.dart';
 import 'package:tmail_ui_user/features/thread/domain/exceptions/thread_exceptions.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/email_response.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/exceptions/isolate_exception.dart';
@@ -141,15 +143,13 @@ class ThreadIsolateWorker {
             EmailComparator(EmailComparatorProperty.receivedAt)
               ..setIsAscending(false)),
           filter: EmailFilterCondition(inMailbox: mailboxId, before: lastEmail?.receivedAt),
-          properties: Properties({EmailProperty.id}));
-
-        var newEmailList = emailsResponse.emailList ?? <Email>[];
-        if (lastEmail != null) {
-          newEmailList = newEmailList.where((email) => email.id != lastEmail!.id).toList();
-        }
-
+          properties: Properties({EmailProperty.id})
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmail?.id
+        ));
+        final newEmailList = emailsResponse.emailList ?? <Email>[];
         log('ThreadIsolateWorker::_emptyMailboxFolderOnWeb(): ${newEmailList.length}');
-
         if (newEmailList.isNotEmpty) {
           lastEmail = newEmailList.last;
           hasEmails = true;
@@ -199,15 +199,10 @@ class ThreadIsolateWorker {
             EmailProperty.id,
             EmailProperty.receivedAt,
           })
-        ).then((response) {
-          var listEmails = response.emailList;
-          if (listEmails != null && listEmails.isNotEmpty && lastEmailId != null) {
-            listEmails = listEmails
-              .where((email) => email.id != lastEmailId)
-              .toList();
-          }
-          return EmailsResponse(emailList: listEmails, state: response.state);
-        });
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmailId
+        ));
         final listEmailRead = emailResponse.emailList;
         log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails: LIST_EMAIL_READ = ${listEmailRead?.length}');
         if (listEmailRead == null || listEmailRead.isEmpty) {
@@ -272,15 +267,10 @@ class ThreadIsolateWorker {
             EmailProperty.id,
             EmailProperty.receivedAt,
           })
-        ).then((response) {
-          var listEmails = response.emailList;
-          if (listEmails != null && listEmails.isNotEmpty && lastEmailId != null) {
-            listEmails = listEmails
-              .where((email) => email.id != lastEmailId)
-              .toList();
-          }
-          return EmailsResponse(emailList: listEmails, state: response.state);
-        });
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmailId
+        ));
         final listEmail = emailResponse.emailList;
         log('ThreadIsolateWorker::moveAllSelectionAllEmails: LIST_EMAIL = ${listEmail?.length}');
         if (listEmail == null || listEmail.isEmpty) {
@@ -354,5 +344,85 @@ class ThreadIsolateWorker {
     }
     log('ThreadIsolateWorker::deleteAllPermanentlyEmails(): TOTAL_DELETED_PERMANENTLY: ${emailIdListCompleted.length}');
     return emailIdListCompleted;
+  }
+
+  Future<List<EmailId>> markAllAsStarredForSelectionAllEmails(
+    Session session,
+    AccountId accountId,
+    MailboxId mailboxId,
+    int totalEmails,
+    StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) async {
+    List<EmailId> emailIdListCompleted = List.empty(growable: true);
+    try {
+      bool mailboxHasEmails = true;
+      UTCDate? lastReceivedDate;
+      EmailId? lastEmailId;
+
+      while (mailboxHasEmails) {
+        final emailResponse = await _threadAPI.getAllEmail(
+          session,
+          accountId,
+          limit: UnsignedInt(30),
+          filter: EmailFilterCondition(
+            inMailbox: mailboxId,
+            notKeyword: KeyWordIdentifier.emailFlagged.value,
+            before: lastReceivedDate
+          ),
+          sort: <Comparator>{}..add(
+            EmailComparator(EmailComparatorProperty.receivedAt)..setIsAscending(false)
+          ),
+          properties: Properties({
+            EmailProperty.id,
+            EmailProperty.receivedAt,
+          })
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmailId
+        ));
+        final listEmails = emailResponse.emailList;
+
+        if (listEmails == null || listEmails.isEmpty) {
+          mailboxHasEmails = false;
+        } else {
+          lastEmailId = listEmails.last.id;
+          lastReceivedDate = listEmails.last.receivedAt;
+
+          final listResult = await _emailAPI.markAsStar(
+            session,
+            accountId,
+            listEmails,
+            MarkStarAction.markStar
+          );
+
+          emailIdListCompleted.addAll(listResult.listEmailIds);
+          onProgressController.add(
+            dartz.Right(MarkAllAsStarredSelectionAllEmailsUpdating(
+              total: totalEmails,
+              countStarred: emailIdListCompleted.length
+            ))
+          );
+        }
+      }
+    } catch (e) {
+      logError('ThreadIsolateWorker::markAllAsStarredForSelectionAllEmails(): ERROR: $e');
+    }
+    return emailIdListCompleted;
+  }
+
+  EmailsResponse _removeDuplicatedLatestEmailFromEmailResponse({
+    required EmailsResponse emailsResponse,
+    EmailId? latestEmailId,
+  }) {
+    List<Email> listEmails = emailsResponse.emailList ?? [];
+    if (listEmails.isNotEmpty && latestEmailId != null) {
+      listEmails = listEmails
+        .where((email) => email.id != latestEmailId)
+        .toList();
+
+      return EmailsResponse(emailList: listEmails, state: emailsResponse.state);
+    } else {
+      return emailsResponse;
+    }
   }
 }
