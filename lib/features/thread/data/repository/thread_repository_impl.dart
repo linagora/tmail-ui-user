@@ -435,17 +435,21 @@ class ThreadRepositoryImpl extends ThreadRepository {
     Session session,
     AccountId accountId,
     MailboxId currentMailboxId,
-    Mailbox destinationMailbox,
+    MailboxId destinationMailboxId,
     int totalEmails,
-    StreamController<dartz.Either<Failure, Success>> onProgressController
+    StreamController<dartz.Either<Failure, Success>> onProgressController,
+    {
+      bool isDestinationSpamMailbox = false
+    }
   ) {
     return mapDataSource[DataSourceType.network]!.moveAllSelectionAllEmails(
       session,
       accountId,
       currentMailboxId,
-      destinationMailbox,
+      destinationMailboxId,
       totalEmails,
-      onProgressController
+      onProgressController,
+      isDestinationSpamMailbox: isDestinationSpamMailbox
     );
   }
 }
