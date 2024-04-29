@@ -143,6 +143,7 @@ extension EmailActionTypeExtension on EmailActionType {
       case EmailActionType.downloadMessageAsEML:
         return imagePaths.icDownloadAttachment;
       case EmailActionType.markAsRead:
+      case EmailActionType.markAllAsRead:
         return imagePaths.icRead;
       case EmailActionType.moveToMailbox:
         return imagePaths.icMove;
@@ -175,6 +176,8 @@ extension EmailActionTypeExtension on EmailActionType {
         return AppLocalizations.of(context).move;
       case EmailActionType.moveToTrash:
         return AppLocalizations.of(context).move_to_trash;
+      case EmailActionType.markAllAsRead:
+        return AppLocalizations.of(context).mark_all_as_read;
       default:
         return '';
     }
