@@ -16,6 +16,7 @@ import 'package:tmail_ui_user/features/starting_page/domain/state/sign_in_twake_
 import 'package:tmail_ui_user/features/starting_page/domain/state/sign_up_twake_workplace_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/main/exceptions/remote_exception.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
@@ -122,6 +123,20 @@ class ToastManager {
         AppLocalizations.of(context).toastMessageMarkAllAsUnreadSelectionAllEmailsHasSomeEmailFailure(success.countEmailsUnread),
         leadingSVGIcon: _imagePaths.icUnreadToast,
       );
+    } else if (success is MoveAllSelectionAllEmailsAllSuccess) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllSelectionAllEmailsSuccess(success.destinationPath),
+        leadingSVGIconColor: Colors.white,
+        leadingSVGIcon: _imagePaths.icFolderMailbox,
+      );
+    } else if (success is MoveAllSelectionAllEmailsHasSomeEmailFailure) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllSelectionAllEmailsHasSomeEmailFailure(success.countEmailsMoved, success.destinationPath),
+        leadingSVGIconColor: Colors.white,
+        leadingSVGIcon: _imagePaths.icFolderMailbox,
+      );
     }
   }
 
@@ -154,6 +169,21 @@ class ToastManager {
       _appToast.showToastErrorMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllAsUnreadSelectionAllEmailsAllFailure,
+      );
+    } else if (failure is MoveAllSelectionAllEmailsFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllSelectionAllEmailsFailureWithReason(
+          failure.destinationPath,
+          failure.exception.toString(),
+        ),
+      );
+    } else if (failure is MoveAllSelectionAllEmailsAllFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllSelectionAllEmailsAllFailure(
+          failure.destinationPath,
+        ),
       );
     }
   }

@@ -44,11 +44,13 @@ class MarkAsMailboxReadInteractor {
 
       if (totalEmailUnread == listEmailId.length) {
         yield Right(MarkAsMailboxReadAllSuccess(
+          mailboxId,
           mailboxDisplayName,
           currentEmailState: currentEmailState,
           currentMailboxState: currentMailboxState));
       } else if (listEmailId.isNotEmpty) {
         yield Right(MarkAsMailboxReadHasSomeEmailFailure(
+          mailboxId,
           mailboxDisplayName,
           listEmailId.length,
           currentEmailState: currentEmailState,

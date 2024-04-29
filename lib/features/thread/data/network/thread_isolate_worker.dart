@@ -28,6 +28,7 @@ import 'package:tmail_ui_user/features/thread/data/network/thread_api.dart';
 import 'package:tmail_ui_user/features/thread/domain/exceptions/thread_exceptions.dart';
 import 'package:tmail_ui_user/features/thread/domain/model/email_response.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/exceptions/isolate_exception.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -225,7 +226,6 @@ class ThreadIsolateWorker {
           emailIdListCompleted.addAll(listEmailId);
           onProgressController.add(
             dartz.Right(MarkAllAsUnreadSelectionAllEmailsUpdating(
-              mailboxId: mailboxId,
               totalRead: totalEmailRead,
               countUnread: emailIdListCompleted.length
             ))
@@ -236,6 +236,77 @@ class ThreadIsolateWorker {
       log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails(): ERROR: $e');
     }
     log('ThreadIsolateWorker::markAllAsUnreadForSelectionAllEmails(): TOTAL_UNREAD: ${emailIdListCompleted.length}');
+    return emailIdListCompleted;
+  }
+
+  Future<List<EmailId>> moveAllSelectionAllEmails(
+    Session session,
+    AccountId accountId,
+    MailboxId currentMailboxId,
+    Mailbox destinationMailbox,
+    int totalEmails,
+    StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) async {
+    List<EmailId> emailIdListCompleted = List.empty(growable: true);
+    try {
+      bool mailboxHasEmails = true;
+      UTCDate? lastReceivedDate;
+      EmailId? lastEmailId;
+
+      while (mailboxHasEmails) {
+        final emailResponse = await _threadAPI.getAllEmail(
+          session,
+          accountId,
+          limit: UnsignedInt(30),
+          filter: EmailFilterCondition(
+            inMailbox: currentMailboxId,
+            before: lastReceivedDate
+          ),
+          sort: <Comparator>{}..add(
+            EmailComparator(EmailComparatorProperty.receivedAt)..setIsAscending(false)
+          ),
+          properties: Properties({
+            EmailProperty.id,
+            EmailProperty.receivedAt,
+          })
+        ).then((response) {
+          var listEmails = response.emailList;
+          if (listEmails != null && listEmails.isNotEmpty && lastEmailId != null) {
+            listEmails = listEmails
+              .where((email) => email.id != lastEmailId)
+              .toList();
+          }
+          return EmailsResponse(emailList: listEmails, state: response.state);
+        });
+        final listEmail = emailResponse.emailList;
+        log('ThreadIsolateWorker::moveAllSelectionAllEmails: LIST_EMAIL = ${listEmail?.length}');
+        if (listEmail == null || listEmail.isEmpty) {
+          mailboxHasEmails = false;
+        } else {
+          lastEmailId = listEmail.last.id;
+          lastReceivedDate = listEmail.last.receivedAt;
+
+          final listEmailId = await _emailAPI.moveSelectionAllEmailsToFolder(
+            session,
+            accountId,
+            currentMailboxId,
+            destinationMailbox,
+            listEmail.listEmailIds,
+          );
+          log('ThreadIsolateWorker::moveAllSelectionAllEmails(): MOVED: ${listEmailId.length}');
+          emailIdListCompleted.addAll(listEmailId);
+          onProgressController.add(
+            dartz.Right(MoveAllSelectionAllEmailsUpdating(
+              total: totalEmails,
+              countMoved: emailIdListCompleted.length
+            ))
+          );
+        }
+      }
+    } catch (e) {
+      log('ThreadIsolateWorker::moveAllSelectionAllEmails(): ERROR: $e');
+    }
+    log('ThreadIsolateWorker::moveAllSelectionAllEmails(): TOTAL_MOVED: ${emailIdListCompleted.length}');
     return emailIdListCompleted;
   }
 }
