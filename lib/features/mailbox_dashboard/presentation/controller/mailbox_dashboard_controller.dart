@@ -3524,6 +3524,28 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     ));
   }
 
+  Future<void> markAllEmailSearchedAsSpam(
+    AppLocalizations appLocalizations,
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) async {
+    final spamMailboxId = getMailboxIdByRole(PresentationMailbox.roleSpam);
+
+    if (spamMailboxId == null) return;
+
+    final spamMailboxPath = mapMailboxById[spamMailboxId]?.getDisplayNameByAppLocalizations(appLocalizations) ?? '';
+
+    consumeState(_moveAllEmailSearchedToFolderInteractor.execute(
+      session,
+      accountId,
+      filterRequest,
+      spamMailboxId,
+      spamMailboxPath,
+      isDestinationSpamMailbox: true
+    ));
+  }
+
   @override
   void onClose() {
     if (PlatformInfo.isWeb) {

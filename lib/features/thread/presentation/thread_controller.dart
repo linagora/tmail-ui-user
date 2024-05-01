@@ -1686,6 +1686,19 @@ class ThreadController extends BaseController with EmailActionController, PopupM
           ),
         );
         break;
+      case EmailActionType.markAllAsSpam:
+        if (currentContext == null) return;
+        final appLocalizations = AppLocalizations.of(currentContext!);
+
+        mailboxDashBoardController.markAllEmailSearchedAsSpam(
+          appLocalizations,
+          _session!,
+          _accountId!,
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
+        );
+        break;
       default:
         break;
     }
