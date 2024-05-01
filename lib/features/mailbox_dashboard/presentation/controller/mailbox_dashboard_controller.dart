@@ -150,6 +150,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/get_email_by_id_state
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_star_multiple_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
@@ -162,6 +163,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/get_email_by_id_in
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_starred_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_read_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_unread_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
@@ -223,6 +225,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   final DeleteAllPermanentlyEmailsInteractor _deleteAllPermanentlyEmailsInteractor;
   final MarkAllAsStarredSelectionAllEmailsInteractor _markAllAsStarredSelectionAllEmailsInteractor;
   final MarkAllSearchAsReadInteractor _markAllSearchAsReadInteractor;
+  final MarkAllSearchAsUnreadInteractor _markAllSearchAsUnreadInteractor;
 
   GetAllVacationInteractor? _getAllVacationInteractor;
   UpdateVacationInteractor? _updateVacationInteractor;
@@ -263,6 +266,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
   final deleteAllPermanentlyEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final markAllAsStarredSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final markAllSearchAsReadViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
+  final markAllSearchAsUnreadViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
 
   Session? sessionCurrent;
   Map<Role, MailboxId> mapDefaultMailboxIdByRole = {};
@@ -333,6 +337,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     this._deleteAllPermanentlyEmailsInteractor,
     this._markAllAsStarredSelectionAllEmailsInteractor,
     this._markAllSearchAsReadInteractor,
+    this._markAllSearchAsUnreadInteractor,
   );
 
   @override
@@ -470,6 +475,10 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
       markAllSearchAsReadViewState.value = Right(success);
     } else if (success is MarkAllSearchAsReadSuccess) {
       _handleMarkAllSearchAsReadSuccess(success);
+    } else if (success is MarkAllSearchAsUnreadLoading) {
+      markAllSearchAsUnreadViewState.value = Right(success);
+    } else if (success is MarkAllSearchAsUnreadSuccess) {
+      _handleMarkAllSearchAsUnreadSuccess(success);
     }
   }
 
@@ -511,6 +520,8 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
       _handleMarkAllAsStarredSelectionAllEmailsFailure(failure);
     } else if (failure is MarkAllSearchAsReadFailure) {
       _handleMarkAllSearchAsReadFailure(failure);
+    } else if (failure is MarkAllSearchAsUnreadFailure) {
+      _handleMarkAllSearchAsUnreadFailure(failure);
     }
   }
 
@@ -3342,6 +3353,40 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
 
   void _handleMarkAllSearchAsReadFailure(Failure failure) {
     markAllSearchAsReadViewState.value = Right(UIState.idle);
+
+    if (currentContext == null || currentOverlayContext == null) return;
+
+    toastManager.showFailureMessage(
+      context: currentContext!,
+      overlayContext: currentOverlayContext!,
+      failure: failure);
+  }
+
+  void markAllSearchAsUnread(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    consumeState(_markAllSearchAsUnreadInteractor.execute(
+      session,
+      accountId,
+      filterRequest
+    ));
+  }
+
+  void _handleMarkAllSearchAsUnreadSuccess(Success success) {
+    markAllSearchAsUnreadViewState.value = Right(UIState.idle);
+
+    if (currentContext == null || currentOverlayContext == null) return;
+
+    toastManager.showSuccessMessage(
+      context: currentContext!,
+      overlayContext: currentOverlayContext!,
+      success: success);
+  }
+
+  void _handleMarkAllSearchAsUnreadFailure(Failure failure) {
+    markAllSearchAsUnreadViewState.value = Right(UIState.idle);
 
     if (currentContext == null || currentOverlayContext == null) return;
 

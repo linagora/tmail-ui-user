@@ -507,4 +507,17 @@ class ThreadRepositoryImpl extends ThreadRepository {
       filterRequest
     );
   }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsUnread(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    return mapDataSource[DataSourceType.network]!.markAllSearchAsUnread(
+      session,
+      accountId,
+      filterRequest
+    );
+  }
 }

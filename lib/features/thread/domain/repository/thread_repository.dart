@@ -118,4 +118,10 @@ abstract class ThreadRepository {
     AccountId accountId,
     SearchEmailFilterRequest filterRequest
   );
+
+  Future<List<EmailId>> markAllSearchAsUnread(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  );
 }

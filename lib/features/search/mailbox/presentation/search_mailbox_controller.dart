@@ -66,6 +66,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/delete_all_permanentl
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 import 'package:tmail_ui_user/main/routes/app_routes.dart';
@@ -186,7 +187,8 @@ class SearchMailboxController extends BaseMailboxController with MailboxActionHa
       _refreshMailboxChanges(mailboxState: success.currentMailboxState);
     } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
       _refreshMailboxChanges(mailboxState: success.currentMailboxState);
-    } else if (success is MarkAllSearchAsReadSuccess) {
+    } else if (success is MarkAllSearchAsReadSuccess
+        || success is MarkAllSearchAsUnreadSuccess) {
       _refreshMailboxChanges();
     }
   }

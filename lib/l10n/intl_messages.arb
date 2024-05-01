@@ -4457,5 +4457,21 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "toastMessageMarkAllSearchAsUnreadSuccess": "You’ve marked all messages in search as unread",
+  "@toastMessageMarkAllSearchAsUnreadSuccess": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "toastMessageMarkAllSearchAsUnreadFailureWithReason": "All message in search could not be marked as unread. Due \"{reason}\"",
+  "@toastMessageMarkAllSearchAsUnreadFailureWithReason": {
+    "type": "text",
+    "placeholders_order": [
+      "reason"
+    ],
+    "placeholders": {
+      "reason": {}
+    }
   }
 }

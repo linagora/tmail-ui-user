@@ -93,6 +93,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/empty_trash_folder_st
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_as_multiple_email_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
@@ -320,7 +321,8 @@ class MailboxController extends BaseMailboxController with MailboxActionHandlerM
           _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
         } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
           _refreshMailboxChanges(currentMailboxState: success.currentMailboxState);
-        } else if (success is MarkAllSearchAsReadSuccess) {
+        } else if (success is MarkAllSearchAsReadSuccess
+            || success is MarkAllSearchAsUnreadSuccess) {
           _refreshMailboxChanges();
         }
       });

@@ -14,6 +14,7 @@ import 'package:jmap_dart_client/jmap/core/user_name.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:model/email/presentation_email.dart';
+import 'package:model/email/read_actions.dart';
 import 'package:model/extensions/email_extension.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/domain/model/search_email_filter_request.dart';
 import 'package:tmail_ui_user/features/thread/data/datasource/thread_datasource.dart';
@@ -227,10 +228,27 @@ class ThreadDataSourceImpl extends ThreadDataSource {
     SearchEmailFilterRequest filterRequest
   ) {
     return Future.sync(() async {
-      return await _threadIsolateWorker.markAllSearchAsRead(
+      return await _threadIsolateWorker.markAllSearchAsReadOrUnread(
         session,
         accountId,
-        filterRequest
+        filterRequest,
+        ReadActions.markAsRead
+      );
+    }).catchError(_exceptionThrower.throwException);
+  }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsUnread(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    return Future.sync(() async {
+      return await _threadIsolateWorker.markAllSearchAsReadOrUnread(
+        session,
+        accountId,
+        filterRequest,
+        ReadActions.markAsUnread
       );
     }).catchError(_exceptionThrower.throwException);
   }

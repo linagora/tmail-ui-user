@@ -19,6 +19,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_sta
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/main/exceptions/remote_exception.dart';
@@ -161,8 +162,12 @@ class ToastManager {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsReadSuccess,
-        leadingSVGIcon: _imagePaths.icReadToast,
-      );
+        leadingSVGIcon: _imagePaths.icReadToast);
+    } else if (success is MarkAllSearchAsUnreadSuccess) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllSearchAsUnreadSuccess,
+        leadingSVGIcon: _imagePaths.icReadToast);
     }
   }
 
@@ -234,9 +239,14 @@ class ToastManager {
       _appToast.showToastErrorMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsReadFailureWithReason(
-          failure.exception.toString(),
-        ),
-      );
+          failure.exception.toString()
+        ));
+    } else if (failure is MarkAllSearchAsUnreadFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllSearchAsUnreadFailureWithReason(
+          failure.exception.toString()
+        ));
     }
   }
 }
