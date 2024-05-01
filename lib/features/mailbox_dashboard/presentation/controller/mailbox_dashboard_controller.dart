@@ -3503,6 +3503,27 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
       failure: failure);
   }
 
+  Future<void> moveAllEmailSearchedToTrash(
+    AppLocalizations appLocalizations,
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) async {
+    final trashMailboxId = getMailboxIdByRole(PresentationMailbox.roleTrash);
+
+    if (trashMailboxId == null) return;
+
+    final trashMailboxPath = mapMailboxById[trashMailboxId]?.getDisplayNameByAppLocalizations(appLocalizations) ?? '';
+
+    consumeState(_moveAllEmailSearchedToFolderInteractor.execute(
+      session,
+      accountId,
+      filterRequest,
+      trashMailboxId,
+      trashMailboxPath
+    ));
+  }
+
   @override
   void onClose() {
     if (PlatformInfo.isWeb) {

@@ -1637,21 +1637,27 @@ class ThreadController extends BaseController with EmailActionController, PopupM
         mailboxDashBoardController.markAllSearchAsRead(
           _session!,
           _accountId!,
-          _searchEmailFilter.toSearchEmailFilterRequest(moreFilterCondition: _getFilterCondition()),
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
         );
         break;
       case EmailActionType.markAllAsUnread:
         mailboxDashBoardController.markAllSearchAsUnread(
           _session!,
           _accountId!,
-          _searchEmailFilter.toSearchEmailFilterRequest(moreFilterCondition: _getFilterCondition()),
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
         );
         break;
       case EmailActionType.markAllAsStarred:
         mailboxDashBoardController.markAllSearchAsStarred(
           _session!,
           _accountId!,
-          _searchEmailFilter.toSearchEmailFilterRequest(moreFilterCondition: _getFilterCondition()),
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
         );
         break;
       case EmailActionType.moveAll:
@@ -1662,7 +1668,22 @@ class ThreadController extends BaseController with EmailActionController, PopupM
           appLocalizations,
           _session!,
           _accountId!,
-          _searchEmailFilter.toSearchEmailFilterRequest(moreFilterCondition: _getFilterCondition()),
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
+        );
+        break;
+      case EmailActionType.moveAllToTrash:
+        if (currentContext == null) return;
+        final appLocalizations = AppLocalizations.of(currentContext!);
+
+        mailboxDashBoardController.moveAllEmailSearchedToTrash(
+          appLocalizations,
+          _session!,
+          _accountId!,
+          _searchEmailFilter.toSearchEmailFilterRequest(
+            moreFilterCondition: _getFilterCondition(),
+          ),
         );
         break;
       default:
