@@ -110,6 +110,7 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
                         Obx(() => MarkAllAsStarredSelectionAllEmailsLoadingWidget(viewState: controller.markAllAsStarredSelectionAllEmailsViewState.value)),
                         Obx(() => PerformActionSearchSelectionEmailLoadingWidget(viewState: controller.markAllSearchAsReadViewState.value)),
                         Obx(() => PerformActionSearchSelectionEmailLoadingWidget(viewState: controller.markAllSearchAsUnreadViewState.value)),
+                        Obx(() => PerformActionSearchSelectionEmailLoadingWidget(viewState: controller.markAllSearchAsStarredViewState.value)),
                         const SpamReportBannerWebWidget(),
                         QuotasBannerWidget(),
                         _buildVacationNotificationMessage(context),

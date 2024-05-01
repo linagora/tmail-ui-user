@@ -4646,4 +4646,18 @@ class AppLocalizations {
       args: [reason]
     );
   }
+
+  String get toastMessageMarkAllSearchAsStarredSuccess {
+    return Intl.message(
+      'You’ve marked all messages in search as starred',
+      name: 'toastMessageMarkAllSearchAsUnreadSuccess');
+  }
+
+  String toastMessageMarkAllSearchAsStarredFailureWithReason(String reason) {
+    return Intl.message(
+      'All message in search could not be marked as starred. Due "$reason"',
+      name: 'toastMessageMarkAllSearchAsStarredFailureWithReason',
+      args: [reason]
+    );
+  }
 }

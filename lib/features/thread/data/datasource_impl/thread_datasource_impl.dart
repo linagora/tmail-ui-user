@@ -13,6 +13,7 @@ import 'package:jmap_dart_client/jmap/core/unsigned_int.dart';
 import 'package:jmap_dart_client/jmap/core/user_name.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
+import 'package:model/email/mark_star_action.dart';
 import 'package:model/email/presentation_email.dart';
 import 'package:model/email/read_actions.dart';
 import 'package:model/extensions/email_extension.dart';
@@ -249,6 +250,22 @@ class ThreadDataSourceImpl extends ThreadDataSource {
         accountId,
         filterRequest,
         ReadActions.markAsUnread
+      );
+    }).catchError(_exceptionThrower.throwException);
+  }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsStarred(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    return Future.sync(() async {
+      return await _threadIsolateWorker.markAllSearchAsStarredOrUnStarred(
+        session,
+        accountId,
+        filterRequest,
+        MarkStarAction.markStar
       );
     }).catchError(_exceptionThrower.throwException);
   }

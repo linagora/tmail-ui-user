@@ -19,6 +19,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/empty_spam_folder_sta
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_starred_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_starred_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
@@ -150,14 +151,12 @@ class ToastManager {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsSuccess,
-        leadingSVGIcon: _imagePaths.icUnreadToast,
-      );
+        leadingSVGIcon: _imagePaths.icStar);
     } else if (success is MarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure) {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllAsStarredSelectionAllEmailsHasSomeEmailFailure(success.countStarred),
-        leadingSVGIcon: _imagePaths.icUnreadToast,
-      );
+        leadingSVGIcon: _imagePaths.icStar);
     } else if (success is MarkAllSearchAsReadSuccess) {
       _appToast.showToastSuccessMessage(
         overlayContext,
@@ -167,6 +166,11 @@ class ToastManager {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsUnreadSuccess,
+        leadingSVGIcon: _imagePaths.icReadToast);
+    } else if (success is MarkAllSearchAsStarredSuccess) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllSearchAsStarredSuccess,
         leadingSVGIcon: _imagePaths.icReadToast);
     }
   }
@@ -245,6 +249,12 @@ class ToastManager {
       _appToast.showToastErrorMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsUnreadFailureWithReason(
+          failure.exception.toString()
+        ));
+    } else if (failure is MarkAllSearchAsStarredFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMarkAllSearchAsStarredFailureWithReason(
           failure.exception.toString()
         ));
     }

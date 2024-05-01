@@ -520,4 +520,17 @@ class ThreadRepositoryImpl extends ThreadRepository {
       filterRequest
     );
   }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsStarred(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    return mapDataSource[DataSourceType.network]!.markAllSearchAsStarred(
+      session,
+      accountId,
+      filterRequest
+    );
+  }
 }

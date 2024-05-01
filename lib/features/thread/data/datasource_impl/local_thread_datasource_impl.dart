@@ -190,4 +190,13 @@ class LocalThreadDataSourceImpl extends ThreadDataSource {
   ) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsStarred(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) {
+    throw UnimplementedError();
+  }
 }

@@ -123,4 +123,10 @@ abstract class ThreadDataSource {
     AccountId accountId,
     SearchEmailFilterRequest filterRequest
   );
+
+  Future<List<EmailId>> markAllSearchAsStarred(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  );
 }
