@@ -238,7 +238,7 @@ class AdvancedFilterController extends BaseController {
       )) ?? [];
   }
 
-  void initSearchFilterField(BuildContext? context) {
+  void initSearchFilterField() {
     subjectFilterInputController.text = StringConvert.writeNullToEmpty(
       _memorySearchFilter.subject);
 
@@ -274,11 +274,13 @@ class AdvancedFilterController extends BaseController {
       toAddressExpandMode.value = ExpandMode.COLLAPSE;
     }
 
-    if (context != null) {
+    if (currentContext != null) {
       mailBoxFilterInputController.text = _memorySearchFilter.mailbox == null
-        ? AppLocalizations.of(context).allFolders
+        ? AppLocalizations.of(currentContext!).allFolders
         : StringConvert.writeNullToEmpty(
-            _memorySearchFilter.mailbox?.getDisplayName(context));
+            _memorySearchFilter.mailbox?.getDisplayName(currentContext!));
+    } else {
+      mailBoxFilterInputController.text = _memorySearchFilter.mailbox?.name?.name ?? '';
     }
   }
 
@@ -482,7 +484,7 @@ class AdvancedFilterController extends BaseController {
         } else if (action is QuickSearchEmailByFromAction) {
           _handleQuickSearchEmailByFromAction(action.emailAddress);
         } else if (action is OpenAdvancedSearchViewAction) {
-          initSearchFilterField(currentContext);
+          initSearchFilterField();
         } else if (action is ClearSearchFilterAppliedAction) {
           clearSearchFilter();
         }
@@ -517,7 +519,7 @@ class AdvancedFilterController extends BaseController {
 
   void _handleStartSearchEmailAction() {
     _memorySearchFilter = searchController.searchEmailFilter.value;
-    initSearchFilterField(currentContext);
+    initSearchFilterField();
   }
 
   void onHasAttachmentCheckboxChanged(bool? isChecked) {
