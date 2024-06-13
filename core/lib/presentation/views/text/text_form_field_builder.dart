@@ -2,6 +2,8 @@ import 'package:core/presentation/extensions/color_extension.dart';
 import 'package:core/utils/direction_utils.dart';
 import 'package:flutter/material.dart';
 
+typedef OnValidator = String? Function(String? value);
+
 class TextFormFieldBuilder extends StatefulWidget {
 
   final ValueChanged<String>? onTextChange;
@@ -25,6 +27,7 @@ class TextFormFieldBuilder extends StatefulWidget {
   final bool readOnly;
   final MouseCursor? mouseCursor;
   final List<String>? autofillHints;
+  final OnValidator? validator;
 
   const TextFormFieldBuilder({
     super.key,
@@ -49,6 +52,7 @@ class TextFormFieldBuilder extends StatefulWidget {
     this.onTap,
     this.onTextChange,
     this.onTextSubmitted,
+    this.validator,
   });
 
   @override
@@ -75,6 +79,42 @@ class _TextFieldFormBuilderState extends State<TextFormFieldBuilder> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.validator != null) {
+      return TextFormField(
+        key: widget.key,
+        controller: _controller,
+        cursorColor: widget.cursorColor,
+        autocorrect: widget.autocorrect,
+        textInputAction: widget.textInputAction,
+        decoration: widget.decoration,
+        maxLines: widget.maxLines,
+        minLines: widget.minLines,
+        keyboardAppearance: widget.keyboardAppearance,
+        style: widget.textStyle,
+        obscureText: widget.obscureText,
+        keyboardType: widget.keyboardType,
+        autofocus: widget.autoFocus,
+        focusNode: widget.focusNode,
+        textDirection: _textDirection,
+        readOnly: widget.readOnly,
+        mouseCursor: widget.mouseCursor,
+        autofillHints: widget.autofillHints,
+        onChanged: (value) {
+          widget.onTextChange?.call(value);
+          if (value.isNotEmpty) {
+            final directionByText = DirectionUtils.getDirectionByEndsText(value);
+            if (directionByText != _textDirection) {
+              setState(() {
+                _textDirection = directionByText;
+              });
+            }
+          }
+        },
+        onFieldSubmitted: widget.onTextSubmitted,
+        onTap: widget.onTap,
+        validator: widget.validator,
+      );
+    }
     return TextField(
       key: widget.key,
       controller: _controller,
