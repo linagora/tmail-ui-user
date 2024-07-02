@@ -2,6 +2,7 @@ import 'package:core/presentation/extensions/color_extension.dart';
 import 'package:core/presentation/utils/style_utils.dart';
 import 'package:core/presentation/views/button/icon_button_web.dart';
 import 'package:core/utils/direction_utils.dart';
+import 'package:core/utils/log_tracking.dart';
 import 'package:core/utils/platform_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +22,7 @@ import 'package:tmail_ui_user/features/manage_account/presentation/model/account
 import 'package:tmail_ui_user/features/manage_account/presentation/model/settings_page_level.dart';
 import 'package:tmail_ui_user/features/manage_account/presentation/notification/notification_view.dart';
 import 'package:tmail_ui_user/features/manage_account/presentation/profiles/profiles_view.dart';
+import 'package:tmail_ui_user/features/manage_account/presentation/trace_log/trace_log_view.dart';
 import 'package:tmail_ui_user/features/manage_account/presentation/vacation/vacation_view.dart';
 import 'package:tmail_ui_user/features/manage_account/presentation/vacation/widgets/vacation_notification_message_widget.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
@@ -37,60 +39,43 @@ class SettingsView extends GetWidget<SettingsController> {
     return Container(
       color: Colors.white,
       child: SafeArea(
-        top: controller.manageAccountDashboardController.isVacationCapabilitySupported,
-        bottom: controller.manageAccountDashboardController.isVacationCapabilitySupported,
-        left: controller.manageAccountDashboardController.isVacationCapabilitySupported &&
-          controller.responsiveUtils.isPortraitMobile(context),
-        right: controller.manageAccountDashboardController.isVacationCapabilitySupported &&
-          controller.responsiveUtils.isPortraitMobile(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SafeArea(
-              bottom: false,
-              child: SizedBox.fromSize(
-                size: const Size.fromHeight(52),
-                child: Padding(
-                  padding: SettingsUtils.getPaddingAppBar(context, controller.responsiveUtils),
-                  child: _buildAppbar(context))),
-            ),
+            SizedBox.fromSize(
+              size: const Size.fromHeight(52),
+              child: Padding(
+                padding: SettingsUtils.getPaddingAppBar(context, controller.responsiveUtils),
+                child: _buildAppbar(context))),
             const Divider(color: AppColor.colorDividerComposer, height: 1),
             Obx(() {
               if (controller.manageAccountDashboardController.vacationResponse.value?.vacationResponderIsValid == true) {
-                return SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: VacationNotificationMessageWidget(
-                      margin: const EdgeInsetsDirectional.only(
-                          start: PlatformInfo.isWeb ? 24 : 16,
-                          end: PlatformInfo.isWeb ? 24 : 16,
-                          top: 16),
-                      fromAccountDashBoard: true,
-                      vacationResponse: controller.manageAccountDashboardController.vacationResponse.value!,
-                      actionGotoVacationSetting: !controller.manageAccountDashboardController.inVacationSettings()
-                        ? () => controller.manageAccountDashboardController.selectAccountMenuItem(AccountMenuItem.vacation)
-                        : null,
-                      actionEndNow: () => controller.manageAccountDashboardController.disableVacationResponder()),
-                );
+                return VacationNotificationMessageWidget(
+                    margin: const EdgeInsetsDirectional.only(
+                        start: PlatformInfo.isWeb ? 24 : 16,
+                        end: PlatformInfo.isWeb ? 24 : 16,
+                        top: 16),
+                    fromAccountDashBoard: true,
+                    vacationResponse: controller.manageAccountDashboardController.vacationResponse.value!,
+                    actionGotoVacationSetting: !controller.manageAccountDashboardController.inVacationSettings()
+                      ? () => controller.manageAccountDashboardController.selectAccountMenuItem(AccountMenuItem.vacation)
+                      : null,
+                    actionEndNow: () => controller.manageAccountDashboardController.disableVacationResponder());
               } else if ((controller.manageAccountDashboardController.vacationResponse.value?.vacationResponderIsWaiting == true
                   || controller.manageAccountDashboardController.vacationResponse.value?.vacationResponderIsStopped == true)
                   && controller.manageAccountDashboardController.inVacationSettings()) {
-                return SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: VacationNotificationMessageWidget(
-                    margin: const EdgeInsetsDirectional.only(
-                      start: PlatformInfo.isWeb ? 24 : 16,
-                      end: PlatformInfo.isWeb ? 24 : 16,
-                      top: 16),
-                    fromAccountDashBoard: true,
-                    vacationResponse: controller.manageAccountDashboardController.vacationResponse.value!,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    leadingIcon: const Padding(
-                      padding: EdgeInsetsDirectional.only(end: 16),
-                      child: Icon(Icons.timer, size: 20),
-                    )
-                  ),
+                return VacationNotificationMessageWidget(
+                  margin: const EdgeInsetsDirectional.only(
+                    start: PlatformInfo.isWeb ? 24 : 16,
+                    end: PlatformInfo.isWeb ? 24 : 16,
+                    top: 16),
+                  fromAccountDashBoard: true,
+                  vacationResponse: controller.manageAccountDashboardController.vacationResponse.value!,
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  leadingIcon: const Padding(
+                    padding: EdgeInsetsDirectional.only(end: 16),
+                    child: Icon(Icons.timer, size: 20),
+                  )
                 );
               } else {
                 return const SizedBox.shrink();
@@ -264,6 +249,13 @@ class SettingsView extends GetWidget<SettingsController> {
           return const SafeArea(
             top: false,
             child: NotificationView());
+          return const NotificationView();
+        case AccountMenuItem.traceLog:
+          if (LogTracking().enableTraceLog) {
+            return const TraceLogView();
+          } else {
+            return const SizedBox.shrink();
+          }
         default:
           return const SizedBox.shrink();
       }

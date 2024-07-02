@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'js_interop_stub.dart' if (dart.library.html) 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:core/data/constants/constant.dart';
@@ -9,6 +7,8 @@ import 'package:core/utils/app_logger.dart';
 import 'package:core/utils/platform_info.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart' as html;
+
+import 'js_interop_stub.dart' if (dart.library.html) 'dart:js_interop';
 
 class HtmlUtils {
   static const lineHeight100Percent = (
@@ -30,7 +30,6 @@ class HtmlUtils {
 
   static const unregisterDropListener = (
     script: '''
-      console.log("unregisterDropListener");
       const editor = document.querySelector(".note-editable");
       const newEditor = editor.cloneNode(true);
       editor.parentNode.replaceChild(newEditor, editor);''',
@@ -76,12 +75,12 @@ class HtmlUtils {
     required String base64Data,
     required String mimeType
   }) {
+    log('HtmlUtils::convertBase64ToImageResourceData:');
     mimeType = validateHtmlImageResourceMimeType(mimeType);
     if (!base64Data.endsWith('==')) {
       base64Data.append('==');
     }
     final imageResource = 'data:$mimeType;base64,$base64Data';
-    log('HtmlUtils::convertBase64ToImageResourceData:imageResource: $imageResource');
     return imageResource;
   }
 
