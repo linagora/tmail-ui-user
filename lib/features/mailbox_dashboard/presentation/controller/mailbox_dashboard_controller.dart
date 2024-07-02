@@ -18,6 +18,7 @@ import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:jmap_dart_client/jmap/core/state.dart' as jmap;
 import 'package:jmap_dart_client/jmap/core/unsigned_int.dart';
+import 'package:jmap_dart_client/jmap/core/user_name.dart';
 import 'package:jmap_dart_client/jmap/identities/identity.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email_address.dart';
@@ -70,6 +71,7 @@ import 'package:tmail_ui_user/features/email/presentation/extensions/composer_ar
 import 'package:tmail_ui_user/features/email/presentation/model/composer_arguments.dart';
 import 'package:tmail_ui_user/features/email/presentation/utils/email_utils.dart';
 import 'package:tmail_ui_user/features/email_recovery/presentation/model/email_recovery_arguments.dart';
+import 'package:tmail_ui_user/features/home/domain/extensions/session_extensions.dart';
 import 'package:tmail_ui_user/features/home/domain/usecases/store_session_interactor.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/model/create_new_mailbox_request.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/state/mark_as_mailbox_read_state.dart';
@@ -89,6 +91,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/download/download_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/search_controller.dart' as search;
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/spam_report_controller.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/synchronize_session_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/extensions/set_error_extension.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/composer_overlay_state.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/dashboard_routes.dart';
@@ -96,6 +99,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/down
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/draggable_app_state.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/preview_email_arguments.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/refresh_action_view_event.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/reopen_app_arguments.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/email_receive_time_type.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/email_sort_order_type.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/quick_search_filter.dart';
@@ -164,6 +168,7 @@ class MailboxDashBoardController extends ReloadableController {
   final AppGridDashboardController appGridDashboardController = Get.find<AppGridDashboardController>();
   final SpamReportController spamReportController = Get.find<SpamReportController>();
   final NetworkConnectionController networkConnectionController = Get.find<NetworkConnectionController>();
+  final SynchronizeSessionController synchronizeSessionController = Get.find<SynchronizeSessionController>();
 
   final MoveToMailboxInteractor _moveToMailboxInteractor;
   final DeleteEmailPermanentlyInteractor _deleteEmailPermanentlyInteractor;
@@ -363,7 +368,11 @@ class MailboxDashBoardController extends ReloadableController {
     } else if (success is MarkAsEmailReadSuccess) {
       _markAsReadEmailSuccess(success);
     } else if (success is DeleteSendingEmailSuccess) {
-      getAllSendingEmails();
+      if (accountId.value != null && sessionCurrent != null) {
+        getAllSendingEmails(
+          accountId: accountId.value!,
+          userName: sessionCurrent!.username);
+      }
     } else if (success is UnsubscribeEmailSuccess) {
       _handleUnsubscribeMailSuccess(success.newEmail);
     } else if (success is RestoreDeletedMessageSuccess) {
@@ -464,13 +473,15 @@ class MailboxDashBoardController extends ReloadableController {
 
   void _handleArguments() {
     final arguments = Get.arguments;
-    log('MailboxDashBoardController::_getSessionCurrent(): arguments = $arguments');
+    log('MailboxDashBoardController::_handleArguments(): arguments = $arguments');
     if (arguments is Session) {
       _handleSession(arguments);
     } else if (arguments is MailtoArguments) {
       _handleMailtoURL(arguments);
     } else if (arguments is PreviewEmailArguments) {
       _handleOpenEmailAction(arguments);
+    }  else if (arguments is ReopenAppArguments) {
+      _handleReopenAppAction(arguments);
     } else {
       dispatchRoute(DashboardRoutes.thread);
       reload();
@@ -501,11 +512,13 @@ class MailboxDashBoardController extends ReloadableController {
 
   void _handleSession(Session session) {
     log('MailboxDashBoardController::_handleSession:');
-    updateAuthenticationAccount(
-      session,
-      session.personalAccount.accountId,
-      session.username
-    );
+    final apiUrl = session.getQualifiedApiUrl(baseUrl: dynamicUrlInterceptors.jmapUrl);
+    if (apiUrl.isNotEmpty) {
+      updateAuthenticationAccount(
+        apiUrl: apiUrl,
+        accountId: session.jmapPersonalAccount.accountId,
+        userName: session.username);
+    }
 
     _setUpComponentsFromSession(session);
 
@@ -517,21 +530,18 @@ class MailboxDashBoardController extends ReloadableController {
   }
 
   void _setUpComponentsFromSession(Session session) {
-    final currentAccountId = session.personalAccount.accountId;
+    final currentAccountId = session.jmapPersonalAccount.accountId;
     sessionCurrent = session;
     accountId.value = currentAccountId;
 
-    injectAutoCompleteBindings(session, currentAccountId);
-    injectRuleFilterBindings(session, currentAccountId);
-    injectVacationBindings(session, currentAccountId);
-    injectFCMBindings(session, currentAccountId);
+    injectDataBindings(session: session, accountId: currentAccountId);
 
-    _getVacationResponse();
-    spamReportController.getSpamReportStateAction();
-    _getAllIdentities();
+    fetchingData(
+      accountId: currentAccountId,
+      session: session,
+      userName: session.username);
 
     if (PlatformInfo.isMobile) {
-      getAllSendingEmails();
       _storeSessionAction(session);
     }
   }
@@ -549,9 +559,62 @@ class MailboxDashBoardController extends ReloadableController {
     _handleNotificationMessageFromEmailId(arguments.emailId);
   }
 
-  void _getVacationResponse() {
-    if (accountId.value != null && _getAllVacationInteractor != null) {
-      consumeState(_getAllVacationInteractor!.execute(accountId.value!));
+  void _handleReopenAppAction(ReopenAppArguments arguments) {
+    log('MailboxDashBoardController::_handleReopenAppAction:ACCOUNT: ${arguments.personalAccount}');
+    dispatchRoute(DashboardRoutes.thread);
+
+    if (arguments.session != null) {
+      sessionCurrent = arguments.session;
+      accountId.value = arguments.personalAccount.accountId;
+
+      injectDataBindings(
+        session: arguments.session!,
+        accountId: arguments.personalAccount.accountId!);
+
+      fetchingData(
+        accountId: arguments.personalAccount.accountId!,
+        userName: arguments.personalAccount.userName!,
+        session: arguments.session!);
+    } else {
+      accountId.value = arguments.personalAccount.accountId!;
+
+      fetchingData(
+        accountId: arguments.personalAccount.accountId!,
+        userName: arguments.personalAccount.userName!);
+    }
+
+    synchronizeSessionController.synchronizeSession();
+
+    if (!_notificationManager.isNotificationClickedOnTerminate) {
+      _handleClickLocalNotificationOnTerminated();
+    }
+  }
+
+  void injectDataBindings({Session? session, AccountId? accountId}) {
+    injectAutoCompleteBindings(session, accountId);
+    injectRuleFilterBindings(session, accountId);
+    injectVacationBindings(session, accountId);
+    injectFCMBindings(session, accountId);
+  }
+
+  void fetchingData({
+    required AccountId accountId,
+    Session? session,
+    UserName? userName
+  }) {
+    if (session != null) {
+      _getAllIdentities(accountId: accountId, session: session);
+    }
+    if (PlatformInfo.isMobile && userName != null) {
+      getAllSendingEmails(accountId: accountId, userName: userName);
+    }
+    _getVacationResponse(accountId: accountId);
+    spamReportController.getSpamReportStateAction();
+  }
+
+  void _getVacationResponse({required AccountId accountId}) {
+    if (_getAllVacationInteractor != null) {
+      consumeState(_getAllVacationInteractor!.execute(accountId));
     }
   }
 
@@ -1477,13 +1540,19 @@ class MailboxDashBoardController extends ReloadableController {
         vacationResponse.value = result.value1;
         dispatchMailboxUIAction(RefreshChangeMailboxAction(null));
       }
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-        () => _replaceBrowserHistory(uri: result.value2)
-      );
+
+      if (PlatformInfo.isWeb) {
+        await Future.delayed(
+          const Duration(milliseconds: 500),
+          () => _replaceBrowserHistory(uri: result.value2));
+      }
     }
 
-    _getAllIdentities();
+    if (accountId.value != null && sessionCurrent != null) {
+      _getAllIdentities(
+        accountId: accountId.value!,
+        session: sessionCurrent!);
+    }
   }
 
   void selectQuickSearchFilter(QuickSearchFilter filter) {
@@ -1557,13 +1626,19 @@ class MailboxDashBoardController extends ReloadableController {
         vacationResponse.value = result.value1;
         dispatchMailboxUIAction(RefreshChangeMailboxAction(null));
       }
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-        () => _replaceBrowserHistory(uri: result.value2)
-      );
+
+      if (PlatformInfo.isWeb) {
+        await Future.delayed(
+          const Duration(milliseconds: 500),
+          () => _replaceBrowserHistory(uri: result.value2));
+      }
     }
 
-    _getAllIdentities();
+    if (accountId.value != null && sessionCurrent != null) {
+      _getAllIdentities(
+        accountId: accountId.value!,
+        session: sessionCurrent!);
+    }
   }
 
   void _handleUpdateVacationSuccess(UpdateVacationSuccess success) {
@@ -2027,7 +2102,11 @@ class MailboxDashBoardController extends ReloadableController {
   }
 
   void _handleStoreSendingEmailSuccess(StoreSendingEmailSuccess success) {
-    getAllSendingEmails();
+    if (accountId.value != null && sessionCurrent != null) {
+      getAllSendingEmails(
+        accountId: accountId.value!,
+        userName: sessionCurrent!.username);
+    }
     if (currentOverlayContext != null && currentContext != null) {
       appToast.showToastWarningMessage(
         currentOverlayContext!,
@@ -2038,7 +2117,11 @@ class MailboxDashBoardController extends ReloadableController {
   }
 
   void _handleUpdateSendingEmailSuccess(UpdateSendingEmailSuccess success) async {
-    getAllSendingEmails();
+    if (accountId.value != null && sessionCurrent != null) {
+      getAllSendingEmails(
+        accountId: accountId.value!,
+        userName: sessionCurrent!.username);
+    }
     if (currentOverlayContext != null && currentContext != null) {
       appToast.showToastWarningMessage(
         currentOverlayContext!,
@@ -2048,13 +2131,11 @@ class MailboxDashBoardController extends ReloadableController {
     }
   }
 
-  void getAllSendingEmails() {
-    if (accountId.value != null && sessionCurrent != null) {
-      consumeState(_getAllSendingEmailInteractor.execute(
-        accountId.value!,
-        sessionCurrent!.username
-      ));
-    }
+  void getAllSendingEmails({
+    required AccountId accountId,
+    required UserName userName
+  }) {
+    consumeState(_getAllSendingEmailInteractor.execute(accountId, userName));
   }
 
   void _handleGetAllSendingEmailsSuccess(GetAllSendingEmailSuccess success) async {
@@ -2283,37 +2364,35 @@ class MailboxDashBoardController extends ReloadableController {
 
   void _replaceBrowserHistory({Uri? uri}) {
     log('MailboxDashBoardController::_replaceBrowserHistory:uri: $uri');
-    if (PlatformInfo.isWeb) {
-      final selectedMailboxId = selectedMailbox.value?.id;
-      final selectedEmailId = selectedEmail.value?.id;
-      final isSearchRunning = searchController.isSearchEmailRunning;
-      String title = '';
-      if (selectedEmail.value != null) {
-        title = 'Email-${selectedEmailId?.asString ?? ''}';
-      } else if (isSearchRunning) {
-        title = 'SearchEmail';
-      } else {
-        title = 'Mailbox-${selectedMailboxId?.asString}';
-      }
-      RouteUtils.replaceBrowserHistory(
-        title: title,
-        url: uri ?? RouteUtils.createUrlWebLocationBar(
-          AppRoutes.dashboard,
-          router: NavigationRouter(
-            emailId: selectedEmail.value?.id,
-            mailboxId: isSearchRunning
-              ? null
-              : selectedMailboxId,
-            dashboardType: isSearchRunning
-              ? DashboardType.search
-              : DashboardType.normal,
-            searchQuery: isSearchRunning
-              ? searchController.searchQuery
-              : null
-          )
-        )
-      );
+    final selectedMailboxId = selectedMailbox.value?.id;
+    final selectedEmailId = selectedEmail.value?.id;
+    final isSearchRunning = searchController.isSearchEmailRunning;
+    String title = '';
+    if (selectedEmail.value != null) {
+      title = 'Email-${selectedEmailId?.asString ?? ''}';
+    } else if (isSearchRunning) {
+      title = 'SearchEmail';
+    } else {
+      title = 'Mailbox-${selectedMailboxId?.asString}';
     }
+    RouteUtils.replaceBrowserHistory(
+      title: title,
+      url: uri ?? RouteUtils.createUrlWebLocationBar(
+        AppRoutes.dashboard,
+        router: NavigationRouter(
+          emailId: selectedEmail.value?.id,
+          mailboxId: isSearchRunning
+            ? null
+            : selectedMailboxId,
+          dashboardType: isSearchRunning
+            ? DashboardType.search
+            : DashboardType.normal,
+          searchQuery: isSearchRunning
+            ? searchController.searchQuery
+            : null
+        )
+      )
+    );
   }
 
   bool _navigateToScreen() {
@@ -2389,7 +2468,18 @@ class MailboxDashBoardController extends ReloadableController {
     log('MailboxDashBoardController::_onBackButtonInterceptor:currentRoute: ${Get.currentRoute} | _isDialogViewOpen: $_isDialogViewOpen');
     if (_isDialogViewOpen) {
       popBack();
-      _replaceBrowserHistory();
+
+      if (PlatformInfo.isMobile) {
+        if (synchronizeSessionController.isShowingWarningDialogSessionExpired) {
+          synchronizeSessionController.resynchronizeSession();
+        } else if (synchronizeSessionController.isShowingWarningDialogResynchronizeSessionFailure) {
+          synchronizeSessionController.exitAndReLoginAction();
+        }
+      }
+
+      if (PlatformInfo.isWeb) {
+        _replaceBrowserHistory();
+      }
       return true;
     }
 
@@ -2524,13 +2614,11 @@ class MailboxDashBoardController extends ReloadableController {
       PlatformInfo.isMobile;
   }
 
-  void _getAllIdentities() {
-    if (accountId.value != null && sessionCurrent != null) {
-      consumeState(_getAllIdentitiesInteractor.execute(
-        sessionCurrent!,
-        accountId.value!
-      ));
-    }
+  void _getAllIdentities({
+    required AccountId accountId,
+    required Session session
+  }) {
+    consumeState(_getAllIdentitiesInteractor.execute(session, accountId));
   }
 
   void _handleGetAllIdentitiesSuccess(GetAllIdentitiesSuccess success) async {
