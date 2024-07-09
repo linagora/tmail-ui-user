@@ -1,60 +1,83 @@
 import 'package:core/presentation/utils/html_transformer/transform_configuration.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/user_name.dart';
-import 'package:jmap_dart_client/jmap/identities/identity.dart';
-import 'package:jmap_dart_client/jmap/mail/email/email.dart';
-import 'package:tmail_ui_user/features/composer/presentation/model/screen_display_mode.dart';
+import 'package:tmail_ui_user/features/email/data/datasource/html_datasource.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/data/datasource/local_storage_browser_datasource.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/data/datasource/session_storage_composer_datasource.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/data/model/composer_cache.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/domain/repository/composer_cache_repository.dart';
 
 class ComposerCacheRepositoryImpl extends ComposerCacheRepository {
 
-  final SessionStorageComposerDatasource composerCacheDataSource;
+  final SessionStorageComposerDatasource _sessionStorageComposerDatasource;
+  final LocalStorageBrowserDatasource _localStorageBrowserDatasource;
+  final HtmlDataSource _htmlDataSource;
 
-  ComposerCacheRepositoryImpl(this.composerCacheDataSource);
+  ComposerCacheRepositoryImpl(
+    this._sessionStorageComposerDatasource,
+    this._localStorageBrowserDatasource,
+    this._htmlDataSource,
+  );
 
   @override
   Future<ComposerCache> getComposerCacheOnWeb(
     AccountId accountId,
     UserName userName
   ) {
-    return composerCacheDataSource.getComposerCacheOnWeb(accountId, userName);
+    return _sessionStorageComposerDatasource.getComposerCache(accountId, userName);
   }
 
   @override
   Future<void> removeComposerCacheOnWeb() {
-    return composerCacheDataSource.removeComposerCacheOnWeb();
+    return _sessionStorageComposerDatasource.deleteComposerCache();
   }
 
   @override
   Future<void> saveComposerCacheOnWeb(
-    Email email,
-    {
-      required AccountId accountId,
-      required UserName userName,
-      required ScreenDisplayMode displayMode,
-      Identity? identity,
-      bool? readReceipentEnabled
-    }
+    ComposerCache composerCache,
+    AccountId accountId,
+    UserName userName
   ) {
-    return composerCacheDataSource.saveComposerCacheOnWeb(
-      email,
-      accountId: accountId,
-      userName: userName,
-      displayMode: displayMode,
-      identity: identity,
-      readReceipentEnabled: readReceipentEnabled);
+    return _sessionStorageComposerDatasource.saveComposerCache(
+      composerCache,
+      accountId,
+      userName);
   }
 
   @override
-  Future<String> restoreEmailInlineImages(
+  Future<String> convertImageCIDToBase64(
     String htmlContent,
     TransformConfiguration transformConfiguration,
-    Map<String, String> mapUrlDownloadCID) {
-    return composerCacheDataSource.restoreEmailInlineImages(
+    Map<String, String> mapUrlDownloadCID
+  ) {
+    return _htmlDataSource.convertImageCIDToBase64(
       htmlContent,
       transformConfiguration,
       mapUrlDownloadCID);
+  }
+
+  @override
+  Future<void> deleteComposerCacheInLocalStorageBrowser() {
+    return _localStorageBrowserDatasource.deleteComposerCache();
+  }
+
+  @override
+  Future<ComposerCache> getComposerCacheInLocalStorageBrowser(
+    AccountId accountId,
+    UserName userName
+  ) {
+    return _localStorageBrowserDatasource.getComposerCache(accountId, userName);
+  }
+
+  @override
+  Future<void> saveComposerCacheToLocalStorageBrowser(
+    ComposerCache composerCache,
+    AccountId accountId,
+    UserName userName
+  ) {
+    return _localStorageBrowserDatasource.saveComposerCache(
+      composerCache,
+      accountId,
+      userName);
   }
 }
