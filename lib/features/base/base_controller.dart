@@ -471,4 +471,10 @@ abstract class BaseController extends GetxController
     authorizationInterceptors.clear();
     await cachingManager.closeHive();
   }
+
+  @override
+  void onClose() {
+    super.onClose();
+    dispose();
+  }
 }

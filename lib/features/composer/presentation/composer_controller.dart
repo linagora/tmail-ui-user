@@ -201,7 +201,6 @@ class ComposerController extends BaseController with DragDropFileMixin implement
   SignatureStatus _identityContentOnOpenPolicy = SignatureStatus.editedAvailable;
 
   late Worker uploadInlineImageWorker;
-  late Worker dashboardViewStateWorker;
   late bool _isEmailBodyLoaded;
 
   ComposerController(
@@ -293,7 +292,6 @@ class ComposerController extends BaseController with DragDropFileMixin implement
     ccEmailAddressController.dispose();
     bccEmailAddressController.dispose();
     uploadInlineImageWorker.dispose();
-    dashboardViewStateWorker.dispose();
     scrollController.dispose();
     scrollControllerEmailAddress.removeListener(_scrollControllerEmailAddressListener);
     scrollControllerEmailAddress.dispose();
