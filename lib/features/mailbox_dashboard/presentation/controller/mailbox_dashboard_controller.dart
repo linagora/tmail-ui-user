@@ -1297,6 +1297,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
           ..onCancelButtonAction(AppLocalizations.of(context).cancel, () => popBack()))
         .build()
         ),
+        barrierDismissible: false,
         barrierColor: AppColor.colorDefaultCupertinoActionSheet,
       );
     }
@@ -2400,6 +2401,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
           })
           ..onCancelButtonAction(AppLocalizations.of(context).cancel, popBack)
         ).build()),
+        barrierDismissible: false,
         barrierColor: AppColor.colorDefaultCupertinoActionSheet,
       );
     }

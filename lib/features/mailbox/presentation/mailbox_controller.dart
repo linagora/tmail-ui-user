@@ -842,6 +842,7 @@ class MailboxController extends BaseMailboxController with MailboxActionHandlerM
               popBack()))
           .build()
         ),
+        barrierDismissible: false,
         barrierColor: AppColor.colorDefaultCupertinoActionSheet,
       );
     }
