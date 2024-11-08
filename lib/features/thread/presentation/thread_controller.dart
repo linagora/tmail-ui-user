@@ -804,10 +804,6 @@ class ThreadController extends BaseController with EmailActionController {
 
   bool get isSearchActive => searchController.isSearchEmailRunning;
 
-  void clearTextSearch() {
-    searchController.clearTextSearch();
-  }
-
   void _searchEmail({UnsignedInt? limit, bool needRefreshSearchState = false}) {
     if (_session != null && _accountId != null) {
       if (!needRefreshSearchState && listEmailController.hasClients) {
