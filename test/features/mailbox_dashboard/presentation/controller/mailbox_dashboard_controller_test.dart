@@ -92,6 +92,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_unread_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_email_searched_to_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/refresh_changes_emails_in_mailbox_interactor.dart';
@@ -190,6 +191,7 @@ const fallbackGenerators = {
   MockSpec<MarkAllSearchAsReadInteractor>(),
   MockSpec<MarkAllSearchAsUnreadInteractor>(),
   MockSpec<MarkAllSearchAsStarredInteractor>(),
+  MockSpec<MoveAllEmailSearchedToFolderInteractor>(),
 ])
 void main() {
   // mock mailbox dashboard controller direct dependencies
@@ -281,6 +283,7 @@ void main() {
   final markAllSearchAsReadInteractor = MockMarkAllSearchAsReadInteractor();
   final markAllSearchAsUnreadInteractor = MockMarkAllSearchAsUnreadInteractor();
   final markAllSearchAsStarredInteractor = MockMarkAllSearchAsStarredInteractor();
+  final moveAllEmailSearchedToFolderInteractor = MockMoveAllEmailSearchedToFolderInteractor();
   late MailboxController mailboxController;
 
   // mock thread controller direct dependencies
@@ -338,6 +341,7 @@ void main() {
     Get.put<MarkAllSearchAsReadInteractor>(markAllSearchAsReadInteractor);
     Get.put<MarkAllSearchAsUnreadInteractor>(markAllSearchAsUnreadInteractor);
     Get.put<MarkAllSearchAsStarredInteractor>(markAllSearchAsStarredInteractor);
+    Get.put<MoveAllEmailSearchedToFolderInteractor>(moveAllEmailSearchedToFolderInteractor);
 
     searchController = SearchController(
       quickSearchEmailInteractor,
@@ -380,6 +384,7 @@ void main() {
       markAllSearchAsReadInteractor,
       markAllSearchAsUnreadInteractor,
       markAllSearchAsStarredInteractor,
+      moveAllEmailSearchedToFolderInteractor,
     );
   });
 

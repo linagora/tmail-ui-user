@@ -7,6 +7,7 @@ import 'package:tmail_ui_user/features/base/mixin/app_loader_mixin.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_starred_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_email_searched_to_folder_state.dart';
 
 class PerformActionSearchSelectionEmailLoadingWidget extends StatelessWidget with AppLoaderMixin {
 
@@ -21,7 +22,8 @@ class PerformActionSearchSelectionEmailLoadingWidget extends StatelessWidget wit
       (success) {
         if (success is MarkAllSearchAsReadLoading
             || success is MarkAllSearchAsUnreadLoading
-            || success is MarkAllSearchAsStarredLoading) {
+            || success is MarkAllSearchAsStarredLoading
+            || success is MoveAllEmailSearchedToFolderLoading) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: horizontalLoadingWidget

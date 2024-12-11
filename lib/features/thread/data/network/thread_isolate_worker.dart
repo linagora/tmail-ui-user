@@ -281,7 +281,7 @@ class ThreadIsolateWorker {
           lastEmailId = listEmail.last.id;
           lastReceivedDate = listEmail.last.receivedAt;
 
-          final listEmailId = await _emailAPI.moveSelectionAllEmailsToFolder(
+          final listEmailId = await _emailAPI.moveAllEmailsToFolderByEmailId(
             session,
             accountId,
             currentMailboxId,
@@ -530,6 +530,65 @@ class ThreadIsolateWorker {
       }
     } catch (e) {
       logError('ThreadIsolateWorker::markAllSearchAsStarredOrUnStarred(): ERROR: $e');
+    }
+    return emailIdListCompleted;
+  }
+
+  Future<List<EmailId>> moveAllEmailSearchedToFolder(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest,
+    MailboxId destinationMailboxId,
+    String destinationPath,
+    {
+      bool isDestinationSpamMailbox = false
+    }
+  ) async {
+    List<EmailId> emailIdListCompleted = List.empty(growable: true);
+    try {
+      bool hasEmails = true;
+      EmailId? lastEmailId;
+
+      while (hasEmails) {
+        final emailResponse = await _threadAPI.getAllEmail(
+          session,
+          accountId,
+          limit: UnsignedInt(30),
+          filter: filterRequest.toEmailFilterConditionByMostRecentSortOrder(),
+          sort: <Comparator>{}..add(
+            EmailComparator(EmailComparatorProperty.receivedAt)..setIsAscending(false)
+          ),
+          properties: Properties({
+            EmailProperty.id,
+            EmailProperty.receivedAt,
+            EmailProperty.mailboxIds,
+          })
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmailId
+        ));
+        final listEmails = emailResponse.emailList;
+
+        if (listEmails == null || listEmails.isEmpty) {
+          hasEmails = false;
+        } else {
+          lastEmailId = listEmails.last.id;
+          UTCDate? lastReceivedDate = listEmails.last.receivedAt;
+          filterRequest = filterRequest.updateBeforeDate(lastReceivedDate);
+
+          final listResult = await _emailAPI.moveAllEmailsToFolderByEmail(
+            session,
+            accountId,
+            destinationMailboxId,
+            listEmails,
+            isDestinationSpamMailbox: isDestinationSpamMailbox
+          );
+
+          emailIdListCompleted.addAll(listResult);
+        }
+      }
+    } catch (e) {
+      logError('ThreadIsolateWorker::markAllSearchToFolder(): ERROR: $e');
     }
     return emailIdListCompleted;
   }

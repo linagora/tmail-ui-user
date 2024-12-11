@@ -130,4 +130,15 @@ abstract class ThreadRepository {
     AccountId accountId,
     SearchEmailFilterRequest filterRequest
   );
+
+  Future<List<EmailId>> moveAllEmailSearchedToFolder(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest,
+    MailboxId destinationMailboxId,
+    String destinationPath,
+    {
+      bool isDestinationSpamMailbox = false
+    }
+  );
 }

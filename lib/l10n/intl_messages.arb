@@ -4473,5 +4473,43 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "toastMessageMarkAllSearchAsStarredSuccess": "You’ve marked all messages in search as starred",
+  "@toastMessageMarkAllSearchAsStarredSuccess": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "toastMessageMarkAllSearchAsStarredFailureWithReason": "All message in search could not be marked as starred. Due \"{reason}\"",
+  "@toastMessageMarkAllSearchAsStarredFailureWithReason": {
+    "type": "text",
+    "placeholders_order": [
+      "reason"
+    ],
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "toastMessageMoveAllEmailSearchedToFolderSuccess": "You’ve moved all mails in search to {destinationPath}",
+  "@toastMessageMoveAllEmailSearchedToFolderSuccess": {
+    "type": "text",
+    "placeholders_order": [
+      "destinationPath"
+    ],
+    "placeholders": {
+      "destinationPath": {}
+    }
+  },
+  "toastMessageMoveAllEmailSearchedToFolderFailureWithReason": "All mails in search could not be moved to {destinationPath}. Due \"{reason}\"",
+  "@toastMessageMoveAllEmailSearchedToFolderFailureWithReason": {
+    "type": "text",
+    "placeholders_order": [
+      "destinationPath",
+      "reason"
+    ],
+    "placeholders": {
+      "destinationPath": {},
+      "reason": {}
+    }
   }
 }

@@ -269,4 +269,27 @@ class ThreadDataSourceImpl extends ThreadDataSource {
       );
     }).catchError(_exceptionThrower.throwException);
   }
+
+  @override
+  Future<List<EmailId>> moveAllEmailSearchedToFolder(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest,
+    MailboxId destinationMailboxId,
+    String destinationPath,
+    {
+      bool isDestinationSpamMailbox = false
+    }
+  ) {
+    return Future.sync(() async {
+      return await _threadIsolateWorker.moveAllEmailSearchedToFolder(
+        session,
+        accountId,
+        filterRequest,
+        destinationMailboxId,
+        destinationPath,
+        isDestinationSpamMailbox: isDestinationSpamMailbox
+      );
+    }).catchError(_exceptionThrower.throwException);
+  }
 }

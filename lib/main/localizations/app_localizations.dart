@@ -4650,7 +4650,7 @@ class AppLocalizations {
   String get toastMessageMarkAllSearchAsStarredSuccess {
     return Intl.message(
       'You’ve marked all messages in search as starred',
-      name: 'toastMessageMarkAllSearchAsUnreadSuccess');
+      name: 'toastMessageMarkAllSearchAsStarredSuccess');
   }
 
   String toastMessageMarkAllSearchAsStarredFailureWithReason(String reason) {
@@ -4658,6 +4658,22 @@ class AppLocalizations {
       'All message in search could not be marked as starred. Due "$reason"',
       name: 'toastMessageMarkAllSearchAsStarredFailureWithReason',
       args: [reason]
+    );
+  }
+
+  String toastMessageMoveAllEmailSearchedToFolderSuccess(String destinationPath) {
+    return Intl.message(
+      'You’ve moved all mails in search to $destinationPath',
+      name: 'toastMessageMoveAllEmailSearchedToFolderSuccess',
+      args: [destinationPath]
+    );
+  }
+
+  String toastMessageMoveAllEmailSearchedToFolderFailureWithReason(String destinationPath, String reason) {
+    return Intl.message(
+      'All mails in search could not be moved to $destinationPath. Due "$reason"',
+      name: 'toastMessageMoveAllEmailSearchedToFolderFailureWithReason',
+      args: [destinationPath, reason]
     );
   }
 }

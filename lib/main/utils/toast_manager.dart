@@ -21,6 +21,7 @@ import 'package:tmail_ui_user/features/thread/domain/state/mark_all_as_unread_se
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_read_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_starred_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/mark_all_search_as_unread_state.dart';
+import 'package:tmail_ui_user/features/thread/domain/state/move_all_email_searched_to_folder_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_all_selection_all_emails_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/move_multiple_email_to_mailbox_state.dart';
 import 'package:tmail_ui_user/main/exceptions/remote_exception.dart';
@@ -166,12 +167,18 @@ class ToastManager {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsUnreadSuccess,
-        leadingSVGIcon: _imagePaths.icReadToast);
+        leadingSVGIcon: _imagePaths.icUnreadToast);
     } else if (success is MarkAllSearchAsStarredSuccess) {
       _appToast.showToastSuccessMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsStarredSuccess,
-        leadingSVGIcon: _imagePaths.icReadToast);
+        leadingSVGIcon: _imagePaths.icStar);
+    } else if (success is MoveAllEmailSearchedToFolderSuccess) {
+      _appToast.showToastSuccessMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllEmailSearchedToFolderSuccess(success.destinationPath),
+        leadingSVGIconColor: Colors.white,
+        leadingSVGIcon: _imagePaths.icFolderMailbox);
     }
   }
 
@@ -255,6 +262,13 @@ class ToastManager {
       _appToast.showToastErrorMessage(
         overlayContext,
         AppLocalizations.of(context).toastMessageMarkAllSearchAsStarredFailureWithReason(
+          failure.exception.toString()
+        ));
+    } else if (failure is MoveAllEmailSearchedToFolderFailure) {
+      _appToast.showToastErrorMessage(
+        overlayContext,
+        AppLocalizations.of(context).toastMessageMoveAllEmailSearchedToFolderFailureWithReason(
+          failure.destinationPath,
           failure.exception.toString()
         ));
     }

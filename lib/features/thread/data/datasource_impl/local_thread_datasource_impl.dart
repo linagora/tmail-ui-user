@@ -199,4 +199,18 @@ class LocalThreadDataSourceImpl extends ThreadDataSource {
   ) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<EmailId>> moveAllEmailSearchedToFolder(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest,
+    MailboxId destinationMailboxId,
+    String destinationPath,
+    {
+      bool isDestinationSpamMailbox = false
+    }
+  ) {
+    throw UnimplementedError();
+  }
 }

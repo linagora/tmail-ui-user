@@ -126,6 +126,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_unread_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_email_searched_to_folder_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/search_email_interactor.dart';
@@ -198,6 +199,7 @@ class MailboxDashBoardBindings extends BaseBindings {
       Get.find<MarkAllSearchAsReadInteractor>(),
       Get.find<MarkAllSearchAsUnreadInteractor>(),
       Get.find<MarkAllSearchAsStarredInteractor>(),
+      Get.find<MoveAllEmailSearchedToFolderInteractor>(),
     ));
     Get.put(AdvancedFilterController());
   }
@@ -400,6 +402,9 @@ class MailboxDashBoardBindings extends BaseBindings {
       Get.find<ThreadRepository>(),
     ));
     Get.lazyPut(() => MarkAllSearchAsStarredInteractor(
+      Get.find<ThreadRepository>(),
+    ));
+    Get.lazyPut(() => MoveAllEmailSearchedToFolderInteractor(
       Get.find<ThreadRepository>(),
     ));
   }

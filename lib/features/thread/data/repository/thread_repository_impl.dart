@@ -533,4 +533,25 @@ class ThreadRepositoryImpl extends ThreadRepository {
       filterRequest
     );
   }
+
+  @override
+  Future<List<EmailId>> moveAllEmailSearchedToFolder(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest,
+    MailboxId destinationMailboxId,
+    String destinationPath,
+    {
+      bool isDestinationSpamMailbox = false
+    }
+  ) {
+    return mapDataSource[DataSourceType.network]!.moveAllEmailSearchedToFolder(
+      session,
+      accountId,
+      filterRequest,
+      destinationMailboxId,
+      destinationPath,
+      isDestinationSpamMailbox: isDestinationSpamMailbox
+    );
+  }
 }
