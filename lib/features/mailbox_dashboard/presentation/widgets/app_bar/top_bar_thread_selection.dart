@@ -143,7 +143,7 @@ class TopBarThreadSelection extends StatelessWidget{
           || selectedMailbox?.isSpam == true
           || selectedMailbox?.isDrafts == true);
 
-  bool get canSpamAndMove => listEmail.isAllCanSpamAndMove(mapMailbox);
+  bool get canSpamAndMove => isSelectAllEmailsEnabled ? true : listEmail.isAllCanSpamAndMove(mapMailbox);
 
   bool get isAllSpam => listEmail.isAllSpam(mapMailbox);
 

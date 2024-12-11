@@ -4,19 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 
-class MessageSelectEmailInPageWidget extends StatelessWidget {
+class MessageSelectEmailOnPageInSearchWidget extends StatelessWidget {
 
   final int limitEmailsInPage;
-  final int totalEmails;
-  final String folderName;
   final VoidCallback onSelectAllEmailAction;
 
-  const MessageSelectEmailInPageWidget({
+  const MessageSelectEmailOnPageInSearchWidget({
     super.key,
     required this.limitEmailsInPage,
-    required this.totalEmails,
-    required this.folderName,
-    required this.onSelectAllEmailAction,
+    required this.onSelectAllEmailAction
   });
 
   @override
@@ -43,10 +39,7 @@ class MessageSelectEmailInPageWidget extends StatelessWidget {
             text: AppLocalizations.of(context).mailsOnThisPageAreSelected,
           ),
           TextSpan(
-            text: AppLocalizations.of(context).selectAllMailInMailbox(
-              totalEmails,
-              folderName,
-            ),
+            text: AppLocalizations.of(context).selectAllMailsThatMatchThisSearch,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColor.primaryColor,
               fontWeight: FontWeight.w500,
