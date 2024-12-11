@@ -14,6 +14,7 @@ import 'package:jmap_dart_client/jmap/core/user_name.dart';
 import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:model/email/presentation_email.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/domain/model/search_email_filter_request.dart';
 import 'package:tmail_ui_user/features/thread/data/datasource/thread_datasource.dart';
 import 'package:tmail_ui_user/features/thread/data/local/email_cache_manager.dart';
 import 'package:tmail_ui_user/features/thread/data/model/email_change_response.dart';
@@ -168,6 +169,15 @@ class LocalThreadDataSourceImpl extends ThreadDataSource {
     MailboxId mailboxId,
     int totalEmails,
     StreamController<dartz.Either<Failure, Success>> onProgressController
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<EmailId>> markAllSearchAsRead(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
   ) {
     throw UnimplementedError();
   }

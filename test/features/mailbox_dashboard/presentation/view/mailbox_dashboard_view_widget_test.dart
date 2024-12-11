@@ -85,6 +85,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/get_emails_in_mail
 import 'package:tmail_ui_user/features/thread/domain/usecases/load_more_emails_in_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_starred_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
@@ -186,6 +187,7 @@ const fallbackGenerators = {
   MockSpec<MoveAllSelectionAllEmailsInteractor>(),
   MockSpec<DeleteAllPermanentlyEmailsInteractor>(),
   MockSpec<MarkAllAsStarredSelectionAllEmailsInteractor>(),
+  MockSpec<MarkAllSearchAsReadInteractor>(),
 ])
 void main() {
   final moveToMailboxInteractor = MockMoveToMailboxInteractor();
@@ -259,6 +261,7 @@ void main() {
   final moveAllSelectionAllEmailsInteractor = MockMoveAllSelectionAllEmailsInteractor();
   final deleteAllPermanentlyEmailsInteractor = MockDeleteAllPermanentlyEmailsInteractor();
   final markAllAsStarredSelectionAllEmailsInteractor = MockMarkAllAsStarredSelectionAllEmailsInteractor();
+  final markAllSearchAsReadInteractor = MockMarkAllSearchAsReadInteractor();
 
   final getEmailsInMailboxInteractor = MockGetEmailsInMailboxInteractor();
   final refreshChangesEmailsInMailboxInteractor = MockRefreshChangesEmailsInMailboxInteractor();
@@ -324,6 +327,7 @@ void main() {
       Get.put<MoveAllSelectionAllEmailsInteractor>(moveAllSelectionAllEmailsInteractor);
       Get.put<DeleteAllPermanentlyEmailsInteractor>(deleteAllPermanentlyEmailsInteractor);
       Get.put<MarkAllAsStarredSelectionAllEmailsInteractor>(markAllAsStarredSelectionAllEmailsInteractor);
+      Get.put<MarkAllSearchAsReadInteractor>(markAllSearchAsReadInteractor);
 
       when(emailReceiveManager.pendingSharedFileInfo).thenAnswer((_) => BehaviorSubject.seeded([]));
 
@@ -364,6 +368,7 @@ void main() {
         moveAllSelectionAllEmailsInteractor,
         deleteAllPermanentlyEmailsInteractor,
         markAllAsStarredSelectionAllEmailsInteractor,
+        markAllSearchAsReadInteractor,
       );
       Get.put(mailboxDashboardController);
       mailboxDashboardController.onReady();

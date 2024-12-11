@@ -24,6 +24,8 @@ import 'package:model/extensions/list_email_extension.dart';
 import 'package:tmail_ui_user/features/base/isolate/background_isolate_binary_messenger/background_isolate_binary_messenger.dart';
 import 'package:tmail_ui_user/features/caching/config/hive_cache_config.dart';
 import 'package:tmail_ui_user/features/email/data/network/email_api.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/domain/extensions/search_email_filter_request_extension.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/domain/model/search_email_filter_request.dart';
 import 'package:tmail_ui_user/features/thread/data/model/empty_mailbox_folder_arguments.dart';
 import 'package:tmail_ui_user/features/thread/data/network/thread_api.dart';
 import 'package:tmail_ui_user/features/thread/domain/exceptions/thread_exceptions.dart';
@@ -424,5 +426,57 @@ class ThreadIsolateWorker {
     } else {
       return emailsResponse;
     }
+  }
+
+  Future<List<EmailId>> markAllSearchAsRead(
+    Session session,
+    AccountId accountId,
+    SearchEmailFilterRequest filterRequest
+  ) async {
+    List<EmailId> emailIdListCompleted = List.empty(growable: true);
+    try {
+      bool hasEmails = true;
+      EmailId? lastEmailId;
+
+      while (hasEmails) {
+        final emailResponse = await _threadAPI.getAllEmail(
+          session,
+          accountId,
+          limit: UnsignedInt(30),
+          filter: filterRequest.toEmailFilterConditionByMostRecentSortOrder(),
+          sort: <Comparator>{}..add(
+            EmailComparator(EmailComparatorProperty.receivedAt)..setIsAscending(false)
+          ),
+          properties: Properties({
+            EmailProperty.id,
+            EmailProperty.receivedAt,
+          })
+        ).then((response) => _removeDuplicatedLatestEmailFromEmailResponse(
+          emailsResponse: response,
+          latestEmailId: lastEmailId
+        ));
+        final listEmails = emailResponse.emailList;
+
+        if (listEmails == null || listEmails.isEmpty) {
+          hasEmails = false;
+        } else {
+          lastEmailId = listEmails.last.id;
+          UTCDate? lastReceivedDate = listEmails.last.receivedAt;
+          filterRequest = filterRequest.updateBeforeDate(lastReceivedDate);
+
+          final listResult = await _emailAPI.markAsRead(
+            session,
+            accountId,
+            listEmails,
+            ReadActions.markAsRead
+          );
+
+          emailIdListCompleted.addAll(listResult);
+        }
+      }
+    } catch (e) {
+      logError('ThreadIsolateWorker::markAllSearchAsRead(): ERROR: $e');
+    }
+    return emailIdListCompleted;
   }
 }

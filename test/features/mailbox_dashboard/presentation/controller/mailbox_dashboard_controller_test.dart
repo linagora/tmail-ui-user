@@ -65,7 +65,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/search_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/spam_report_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/advanced_search_filter.dart';
-import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/email_receive_time_type.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/domain/model/email_receive_time_type.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/email_sort_order_type.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/search/search_email_filter.dart';
 import 'package:tmail_ui_user/features/manage_account/data/local/language_cache_manager.dart';
@@ -87,6 +87,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/get_emails_in_mail
 import 'package:tmail_ui_user/features/thread/domain/usecases/load_more_emails_in_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_starred_selection_all_emails_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_as_unread_selection_all_emails_interactor.dart';
+import 'package:tmail_ui_user/features/thread/domain/usecases/mark_all_search_as_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_all_selection_all_emails_interactor.dart';
@@ -184,6 +185,7 @@ const fallbackGenerators = {
   MockSpec<MoveAllSelectionAllEmailsInteractor>(),
   MockSpec<DeleteAllPermanentlyEmailsInteractor>(),
   MockSpec<MarkAllAsStarredSelectionAllEmailsInteractor>(),
+  MockSpec<MarkAllSearchAsReadInteractor>(),
 ])
 void main() {
   // mock mailbox dashboard controller direct dependencies
@@ -272,6 +274,7 @@ void main() {
   final moveAllSelectionAllEmailsInteractor = MockMoveAllSelectionAllEmailsInteractor();
   final deleteAllPermanentlyEmailsInteractor = MockDeleteAllPermanentlyEmailsInteractor();
   final markAllAsStarredSelectionAllEmailsInteractor = MockMarkAllAsStarredSelectionAllEmailsInteractor();
+  final markAllSearchAsReadInteractor = MockMarkAllSearchAsReadInteractor();
   late MailboxController mailboxController;
 
   // mock thread controller direct dependencies
@@ -326,6 +329,7 @@ void main() {
     Get.put<MoveAllSelectionAllEmailsInteractor>(moveAllSelectionAllEmailsInteractor);
     Get.put<DeleteAllPermanentlyEmailsInteractor>(deleteAllPermanentlyEmailsInteractor);
     Get.put<MarkAllAsStarredSelectionAllEmailsInteractor>(markAllAsStarredSelectionAllEmailsInteractor);
+    Get.put<MarkAllSearchAsReadInteractor>(markAllSearchAsReadInteractor);
 
     searchController = SearchController(
       quickSearchEmailInteractor,
@@ -365,6 +369,7 @@ void main() {
       moveAllSelectionAllEmailsInteractor,
       deleteAllPermanentlyEmailsInteractor,
       markAllAsStarredSelectionAllEmailsInteractor,
+      markAllSearchAsReadInteractor,
     );
   });
 

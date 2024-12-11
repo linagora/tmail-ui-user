@@ -4611,4 +4611,25 @@ class AppLocalizations {
       name: 'allMailsInThisSearchAreSelected'
     );
   }
+
+  String get messageConfirmationDialogWhenMakeToActionForSelectionAllEmailsInSearch {
+    return Intl.message(
+      'This action will affect all mails in search. Are you sure you want to continue?',
+      name: 'messageConfirmationDialogWhenMakeToActionForSelectionAllEmailsInSearch'
+    );
+  }
+
+  String get toastMessageMarkAllSearchAsReadSuccess {
+    return Intl.message(
+      'You’ve marked all messages in search as read',
+      name: 'toastMessageMarkAllSearchAsReadSuccess');
+  }
+
+  String toastMessageMarkAllSearchAsReadFailureWithReason(String reason) {
+    return Intl.message(
+      'All message in search could not be marked as read. Due "$reason"',
+      name: 'toastMessageMarkAllSearchAsReadFailureWithReason',
+      args: [reason]
+    );
+  }
 }
