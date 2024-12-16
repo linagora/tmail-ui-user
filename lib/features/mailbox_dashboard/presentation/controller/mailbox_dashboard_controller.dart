@@ -30,6 +30,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:tmail_ui_user/features/base/action/ui_action.dart';
 import 'package:tmail_ui_user/features/base/mixin/contact_support_mixin.dart';
+import 'package:tmail_ui_user/features/base/mixin/email_action_handler_mixin.dart';
 import 'package:tmail_ui_user/features/base/reloadable/reloadable_controller.dart';
 import 'package:tmail_ui_user/features/composer/domain/exceptions/set_method_exception.dart';
 import 'package:tmail_ui_user/features/composer/domain/extensions/email_request_extension.dart';
@@ -182,7 +183,9 @@ import 'package:tmail_ui_user/main/utils/ios_notification_manager.dart';
 import 'package:uuid/uuid.dart';
 
 class MailboxDashBoardController extends ReloadableController
-    with UserSettingPopupMenuMixin, ContactSupportMixin {
+    with UserSettingPopupMenuMixin,
+        ContactSupportMixin,
+        EmailActionHandlerMixin {
 
   final RemoveEmailDraftsInteractor _removeEmailDraftsInteractor = Get.find<RemoveEmailDraftsInteractor>();
   final EmailReceiveManager _emailReceiveManager = Get.find<EmailReceiveManager>();
@@ -255,6 +258,7 @@ class MailboxDashBoardController extends ReloadableController
   final isRecoveringDeletedMessage = RxBool(false);
   final localFileDraggableAppState = Rxn<DraggableAppState>();
   final isSelectAllEmailsEnabled = RxBool(false);
+  final isSelectAllPageEnabled = RxBool(false);
   final markAllAsUnreadSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final moveAllSelectionAllEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
   final deleteAllPermanentlyEmailsViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
@@ -811,8 +815,8 @@ class MailboxDashBoardController extends ReloadableController
   }
 
   MailboxId? get spamMailboxId {
-    return mapDefaultMailboxIdByRole[PresentationMailbox.roleJunk]
-      ?? mapDefaultMailboxIdByRole[PresentationMailbox.roleSpam];
+    return getMailboxIdByRole(PresentationMailbox.roleJunk)
+      ?? getMailboxIdByRole(PresentationMailbox.roleSpam);
   }
 
   void setMapDefaultMailboxIdByRole(Map<Role, MailboxId> newMapMailboxId) {
@@ -1224,6 +1228,122 @@ class MailboxDashBoardController extends ReloadableController
     }
   }
 
+  void dragAllSelectedEmailToMailboxAction(PresentationMailbox destinationMailbox) {
+    if (selectedMailbox.value == null) return;
+
+    showConfirmDialogWhenMakeToActionForSelectionAllEmails(
+      imagePaths: imagePaths,
+      totalEmails: selectedMailbox.value!.countTotalEmails,
+      folderName: currentContext != null
+        ? selectedMailbox.value!.getDisplayName(currentContext!)
+        : '',
+      onConfirmAction: () => handleActionsForSelectionAllEmails(
+        context: currentContext!,
+        selectedMailbox: selectedMailbox.value!,
+        actionType: _getTypeMoveAllActionForMailbox(destinationMailbox),
+        destinationMailbox: destinationMailbox,
+      ),
+    );
+  }
+
+  EmailActionType _getTypeMoveAllActionForMailbox(PresentationMailbox presentationMailbox) {
+    if (presentationMailbox.isTrash) {
+      return EmailActionType.moveAllToTrash;
+    } else if (presentationMailbox.isSpam) {
+      return EmailActionType.markAllAsSpam;
+    } else {
+      return EmailActionType.moveAll;
+    }
+  }
+
+  void handleActionsForSelectionAllEmails({
+    required BuildContext context,
+    required PresentationMailbox selectedMailbox,
+    required EmailActionType actionType,
+    PresentationMailbox? destinationMailbox,
+  }) {
+    log('MailboxDashBoardController::handleActionsForSelectionAllEmails:actionType = $actionType');
+    if (sessionCurrent == null || accountId.value == null) {
+      logError('MailboxDashBoardController::_handleActionsForSelectionAllEmails: SESSION & ACCOUNT_ID is null');
+      return;
+    }
+
+    switch(actionType) {
+      case EmailActionType.markAllAsRead:
+        markAsReadMailbox(
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox.mailboxId!,
+          selectedMailbox.getDisplayName(context),
+          selectedMailbox.countUnreadEmails,
+        );
+        break;
+      case EmailActionType.markAllAsUnread:
+        markAllAsUnreadSelectionAllEmails(
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox.mailboxId!,
+          selectedMailbox.getDisplayName(context),
+          selectedMailbox.countReadEmails,
+        );
+        break;
+      case EmailActionType.moveAll:
+        moveAllSelectionAllEmails(
+          context,
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox,
+          destinationMailbox: destinationMailbox,
+        );
+        break;
+      case EmailActionType.moveAllToTrash:
+        moveAllToTrashSelectionAllEmails(
+          context,
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox,
+          trashMailbox: destinationMailbox,
+        );
+        break;
+      case EmailActionType.deleteAllPermanently:
+        deleteAllPermanentlyEmails(
+          context,
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox,
+        );
+        break;
+      case EmailActionType.markAllAsStarred:
+        markAllAsStarredSelectionAllEmails(
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox.mailboxId!,
+          selectedMailbox.getDisplayName(context),
+          selectedMailbox.countTotalEmails,
+        );
+        break;
+      case EmailActionType.markAllAsSpam:
+        maskAllAsSpamSelectionAllEmails(
+          context,
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox,
+          spamMailbox: destinationMailbox,
+        );
+        break;
+      case EmailActionType.allUnSpam:
+        allUnSpamSelectionAllEmails(
+          context,
+          sessionCurrent!,
+          accountId.value!,
+          selectedMailbox,
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
   void dragSelectedMultipleEmailToMailboxAction(
     List<PresentationEmail> listEmails,
     PresentationMailbox destinationMailbox,
@@ -1246,7 +1366,6 @@ class MailboxDashBoardController extends ReloadableController
         _handleDragSelectedMultipleEmailToMailboxAction({selectedMailbox.value!.id: listEmails.listEmailIds}, destinationMailbox);
       }
     }
-
   }
 
   void _handleDragSelectedMultipleEmailToMailboxAction(
@@ -2631,6 +2750,7 @@ class MailboxDashBoardController extends ReloadableController
   }
 
   void selectAllEmailAction() {
+    isSelectAllPageEnabled.value = true;
     dispatchAction(SelectionAllEmailAction());
   }
 
@@ -3107,19 +3227,26 @@ class MailboxDashBoardController extends ReloadableController
     BuildContext context,
     Session session,
     AccountId accountId,
-    PresentationMailbox currentMailbox
+    PresentationMailbox currentMailbox,
+    {
+      PresentationMailbox? destinationMailbox,
+    }
   ) async {
-    final arguments = DestinationPickerArguments(
-      accountId,
-      MailboxActions.moveEmail,
-      session,
-      mailboxIdSelected: currentMailbox.id);
+    if (destinationMailbox == null) {
+      final arguments = DestinationPickerArguments(
+        accountId,
+        MailboxActions.moveEmail,
+        session,
+        mailboxIdSelected: currentMailbox.id,
+      );
 
-    final destinationMailbox = PlatformInfo.isWeb
-      ? await DialogRouter.pushGeneralDialog(
-          routeName: AppRoutes.destinationPicker,
-          arguments: arguments)
-      : await push(AppRoutes.destinationPicker, arguments: arguments);
+      destinationMailbox = PlatformInfo.isWeb
+        ? await DialogRouter.pushGeneralDialog(
+            routeName: AppRoutes.destinationPicker,
+            arguments: arguments,
+          )
+        : await push(AppRoutes.destinationPicker, arguments: arguments);
+    }
 
     if (destinationMailbox is PresentationMailbox) {
       consumeState(_moveAllSelectionAllEmailsInteractor.execute(
@@ -3127,7 +3254,9 @@ class MailboxDashBoardController extends ReloadableController
         accountId,
         currentMailbox.id,
         destinationMailbox.id,
-        destinationMailbox.mailboxPath ?? (context.mounted ? destinationMailbox.getDisplayName(context) : ''),
+        destinationMailbox.mailboxPath ?? (context.mounted
+          ? destinationMailbox.getDisplayName(context)
+          : ''),
         currentMailbox.countTotalEmails,
         _moveAllSelectionAllEmailsStreamController,
         isDestinationSpamMailbox: destinationMailbox.isSpam
@@ -3163,13 +3292,21 @@ class MailboxDashBoardController extends ReloadableController
     BuildContext context,
     Session session,
     AccountId accountId,
-    PresentationMailbox currentMailbox
+    PresentationMailbox currentMailbox,
+    {
+      PresentationMailbox? trashMailbox,
+    }
   ) async {
-    final trashMailboxId = getMailboxIdByRole(PresentationMailbox.roleTrash);
+    MailboxId? trashMailboxId = trashMailbox?.id;
+    String? trashMailboxPath = trashMailbox?.getDisplayName(context) ?? '';
+
+    if (trashMailbox == null) {
+      trashMailboxId = getMailboxIdByRole(PresentationMailbox.roleTrash);
+      if (trashMailboxId == null) return;
+      trashMailboxPath = mapMailboxById[trashMailboxId]?.getDisplayName(context) ?? '';
+    }
 
     if (trashMailboxId == null) return;
-
-    final trashMailboxPath = mapMailboxById[trashMailboxId]?.getDisplayName(context) ?? '';
 
     consumeState(_moveAllSelectionAllEmailsInteractor.execute(
       session,
@@ -3266,13 +3403,21 @@ class MailboxDashBoardController extends ReloadableController
     BuildContext context,
     Session session,
     AccountId accountId,
-    PresentationMailbox currentMailbox
+    PresentationMailbox currentMailbox,
+    {
+      PresentationMailbox? spamMailbox,
+    }
   ) async {
-    final spamMailboxId = getMailboxIdByRole(PresentationMailbox.roleSpam);
+    MailboxId? spamMailboxId = spamMailbox?.id;
+    String spamMailboxPath = spamMailbox?.getDisplayName(context) ?? '';
+
+    if (spamMailbox == null) {
+      spamMailboxId = this.spamMailboxId;
+      if (spamMailboxId == null) return;
+      spamMailboxPath = mapMailboxById[spamMailboxId]?.getDisplayName(context) ?? '';
+    }
 
     if (spamMailboxId == null) return;
-
-    final spamMailboxPath = mapMailboxById[spamMailboxId]?.getDisplayName(context) ?? '';
 
     consumeState(_moveAllSelectionAllEmailsInteractor.execute(
       session,

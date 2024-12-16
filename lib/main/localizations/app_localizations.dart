@@ -4416,12 +4416,11 @@ class AppLocalizations {
     );
   }
 
-}
-
-  String get mailsOnThisPageAreSelected {
+  String mailsOnThisPageAreSelected(int countEmails) {
     return Intl.message(
-      'mails on this page are selected. ',
-      name: 'mailsOnThisPageAreSelected'
+      'All $countEmails mails on this page are selected.',
+      name: 'mailsOnThisPageAreSelected',
+      args: [countEmails]
     );
   }
 
@@ -4433,11 +4432,11 @@ class AppLocalizations {
     );
   }
 
-  String mailsInMailboxAreSelected(String folderName) {
+  String mailsInMailboxAreSelected(int totalEmails, String folderName) {
     return Intl.message(
-      'mails in $folderName are selected. ',
+      'All $totalEmails mails in $folderName are selected.',
       name: 'mailsInMailboxAreSelected',
-      args: [folderName]
+      args: [totalEmails, folderName]
     );
   }
 
@@ -4611,6 +4610,13 @@ class AppLocalizations {
     return Intl.message(
       'Mark all as spam',
       name: 'markAllAsSpam',
+    );
+  }
+
+  String get moveAllConversation {
+    return Intl.message(
+      'Move all conversation',
+      name: 'moveAllConversation',
     );
   }
 }

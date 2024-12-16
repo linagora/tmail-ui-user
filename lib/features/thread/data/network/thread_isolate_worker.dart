@@ -245,6 +245,7 @@ class ThreadIsolateWorker {
       bool isDestinationSpamMailbox = false
     }
   ) async {
+    log('ThreadIsolateWorker::moveAllSelectionAllEmails: destinationMailboxId = $destinationMailboxId | totalEmails = $totalEmails');
     List<EmailId> emailIdListCompleted = List.empty(growable: true);
     try {
       bool mailboxHasEmails = true;

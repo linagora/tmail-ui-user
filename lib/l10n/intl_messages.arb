@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2024-12-12T15:50:46.911821",
+  "@@last_modified": "2024-12-16T10:24:28.478967",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4206,11 +4206,15 @@
     "placeholders_order": [],
     "placeholders": {}
   },
-  "mailsOnThisPageAreSelected": "mails on this page are selected. ",
+  "mailsOnThisPageAreSelected": "All {countEmails} mails on this page are selected.",
   "@mailsOnThisPageAreSelected": {
     "type": "text",
-    "placeholders_order": [],
-    "placeholders": {}
+    "placeholders_order": [
+      "countEmails"
+    ],
+    "placeholders": {
+      "countEmails": {}
+    }
   },
   "selectAllMailInMailbox": "Select all {total} mails in {folderName}",
   "@selectAllMailInMailbox": {
@@ -4224,13 +4228,15 @@
       "folderName": {}
     }
   },
-  "mailsInMailboxAreSelected": "mails in {folderName} are selected. ",
+  "mailsInMailboxAreSelected": "All {totalEmails} mails in {folderName} are selected.",
   "@mailsInMailboxAreSelected": {
     "type": "text",
     "placeholders_order": [
+      "totalEmails",
       "folderName"
     ],
     "placeholders": {
+      "totalEmails": {},
       "folderName": {}
     }
   },
@@ -4423,5 +4429,23 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "allUnSpam": "All UnSpam",
+  "@allUnSpam": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "markAllAsSpam": "Mark all as spam",
+  "@markAllAsSpam": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "moveAllConversation": "Move all conversation",
+  "@moveAllConversation": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
   }
 }

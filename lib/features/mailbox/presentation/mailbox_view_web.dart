@@ -14,6 +14,7 @@ import 'package:tmail_ui_user/features/mailbox/presentation/widgets/mailbox_load
 import 'package:tmail_ui_user/features/mailbox/presentation/widgets/user_information_widget.dart';
 import 'package:tmail_ui_user/features/quotas/presentation/quotas_view.dart';
 import 'package:tmail_ui_user/features/quotas/presentation/styles/quotas_view_styles.dart';
+import 'package:tmail_ui_user/features/thread/presentation/model/draggable_email_data.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 import 'package:tmail_ui_user/main/utils/app_config.dart';
 
@@ -393,15 +394,29 @@ class MailboxView extends BaseMailboxView {
     }).toList() ?? <Widget>[];
   }
 
-  void _handleDragItemAccepted(List<PresentationEmail> listEmails, PresentationMailbox presentationMailbox) {
+  void _handleDragItemAccepted(
+    DraggableEmailData draggableEmailData,
+    PresentationMailbox presentationMailbox,
+  ) {
     final mailboxPath = controller.findNodePath(presentationMailbox.id)
         ?? presentationMailbox.name?.name;
     log('MailboxView::_handleDragItemAccepted(): mailboxPath: $mailboxPath');
     if (mailboxPath != null) {
-      final newMailbox = presentationMailbox.toPresentationMailboxWithMailboxPath(mailboxPath);
-      controller.mailboxDashBoardController.dragSelectedMultipleEmailToMailboxAction(listEmails, newMailbox);
+      presentationMailbox = presentationMailbox
+        .toPresentationMailboxWithMailboxPath(mailboxPath);
+    }
+
+    if (draggableEmailData.isSelectAllEmailsEnabled) {
+      controller
+        .mailboxDashBoardController
+        .dragAllSelectedEmailToMailboxAction(presentationMailbox);
     } else {
-      controller.mailboxDashBoardController.dragSelectedMultipleEmailToMailboxAction(listEmails, presentationMailbox);
+      controller
+        .mailboxDashBoardController
+        .dragSelectedMultipleEmailToMailboxAction(
+          draggableEmailData.listEmails!,
+          presentationMailbox,
+        );
     }
   }
 }
