@@ -11,6 +11,7 @@ import 'package:tmail_ui_user/features/base/widget/compose_floating_button.dart'
 import 'package:tmail_ui_user/features/email/presentation/model/composer_arguments.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/email_action_cupertino_action_sheet_action_builder.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/state/mark_as_mailbox_read_state.dart';
+import 'package:tmail_ui_user/features/mailbox/presentation/extensions/presentation_mailbox_extension.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/mixin/filter_email_popup_menu_mixin.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/recover_deleted_message_loading_banner_widget.dart';
 import 'package:tmail_ui_user/features/manage_account/presentation/extensions/vacation_response_extension.dart';
@@ -21,6 +22,7 @@ import 'package:tmail_ui_user/features/thread/domain/model/filter_message_option
 import 'package:tmail_ui_user/features/thread/domain/state/get_all_email_state.dart';
 import 'package:tmail_ui_user/features/thread/domain/state/search_email_state.dart';
 import 'package:tmail_ui_user/features/thread/presentation/model/delete_action_type.dart';
+import 'package:tmail_ui_user/features/thread/presentation/model/draggable_email_data.dart';
 import 'package:tmail_ui_user/features/thread/presentation/model/loading_more_status.dart';
 import 'package:tmail_ui_user/features/thread/presentation/styles/item_email_tile_styles.dart';
 import 'package:tmail_ui_user/features/thread/presentation/styles/scroll_to_top_button_widget_styles.dart';
@@ -30,11 +32,13 @@ import 'package:tmail_ui_user/features/thread/presentation/widgets/app_bar/app_b
 import 'package:tmail_ui_user/features/thread/presentation/widgets/banner_delete_all_spam_emails_widget.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/banner_empty_trash_widget.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/bottom_bar_thread_selection_widget.dart';
+import 'package:tmail_ui_user/features/thread/presentation/widgets/draggable/draggable_feedback_widget.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/email_tile_builder.dart'
   if (dart.library.html) 'package:tmail_ui_user/features/thread/presentation/widgets/email_tile_web_builder.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/empty_emails_widget.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/filter_message_cupertino_action_sheet_action_builder.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/scroll_to_top_button_widget.dart';
+import 'package:tmail_ui_user/features/thread/presentation/widgets/select_all_banner/select_all_emails_in_mailbox_banner.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/spam_banner/spam_report_banner_widget.dart';
 import 'package:tmail_ui_user/features/thread/presentation/widgets/thread_view_loading_bar_widget.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
@@ -163,6 +167,30 @@ class ThreadView extends GetWidget<ThreadController>
                       }),
                       if (!controller.responsiveUtils.isDesktop(context))
                         _buildMarkAsMailboxReadLoading(context),
+                      if (controller.responsiveUtils.isWebDesktop(context))
+                        Obx(() {
+                          if (controller.validateToShowSelectionEmailsBanner()) {
+                            final selectedMailbox = controller
+                              .mailboxDashBoardController
+                              .selectedMailbox
+                              .value!;
+
+                            final listEmailSelectedLength = controller
+                              .mailboxDashBoardController
+                              .listEmailSelected
+                              .length;
+
+                            return SelectAllEmailInMailboxBanner(
+                              limitEmailsInPage: listEmailSelectedLength,
+                              totalEmails: selectedMailbox.countTotalEmails,
+                              folderName: selectedMailbox.getDisplayName(context),
+                              onSelectAllEmailAction: controller.enableSelectAllEmails,
+                              onClearSelection: controller.cancelSelectEmail
+                            );
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        }),
                       Obx(() => ThreadViewLoadingBarWidget(viewState: controller.viewState.value)),
                       Expanded(
                         child: Container(
@@ -471,13 +499,33 @@ class ThreadView extends GetWidget<ThreadController>
   }
 
   Widget _buildEmailItemDraggable(BuildContext context, PresentationEmail presentationEmail) {
+    final isSelectAllEmailsEnabled = controller
+      .mailboxDashBoardController
+      .isSelectAllEmailsEnabled
+      .value;
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onSecondaryTapDown: (_) {},
       onTapDown: (_) {},
-      child: Draggable<List<PresentationEmail>>(
-        data: controller.listEmailDrag,
-        feedback: _buildFeedBackWidget(context),
+      child: Draggable<DraggableEmailData>(
+        data: isSelectAllEmailsEnabled
+          ? DraggableEmailData.withSelectAllEmails()
+          : DraggableEmailData(listEmails: controller.listEmailDrag),
+        feedback: Obx(() {
+          final isSelectAllEmailsEnabled = controller
+            .mailboxDashBoardController
+            .isSelectAllEmailsEnabled
+            .value;
+          return DraggableFeedbackWidget(
+            icon: controller.imagePaths.icFilterMessageAll,
+            title: isSelectAllEmailsEnabled
+              ? AppLocalizations.of(context).moveAllConversation
+              : AppLocalizations.of(context).moveConversation(
+                  controller.listEmailDrag.length,
+                ),
+          );
+        }),
         childWhenDragging: _buildEmailItemWhenDragging(context, presentationEmail),
         dragAnchorStrategy: pointerDragAnchorStrategy,
         onDragStarted: () {
@@ -622,43 +670,6 @@ class ThreadView extends GetWidget<ThreadController>
         _popupMenuActionTile(context, presentationEmail)
       );
     }
-  }
-
-  Widget _buildFeedBackWidget(BuildContext context) {
-    return SizedBox(
-      height: 60,
-      child: Material(
-        clipBehavior: Clip.hardEdge,
-        borderRadius: BorderRadius.circular(10),
-        color: AppColor.colorTextButton,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                controller.imagePaths.icFilterMessageAll,
-                width: 24,
-                height: 24,
-                fit: BoxFit.fill,
-                colorFilter: Colors.white.asFilter(),
-              ),
-              const SizedBox(width: 10),
-              Obx(
-                () => Text(
-                  AppLocalizations.of(context).moveConversation(controller.listEmailDrag.length),
-                  overflow: TextOverflow.clip,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildEmptyEmail(BuildContext context) {
