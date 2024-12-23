@@ -21,7 +21,7 @@ class StringConvert {
     }
   }
 
-  static String toUrlScheme(String hotScheme) {
-    return '$hotScheme://';
+  static String toUrlScheme(String hostScheme) {
+    return '$hostScheme://';
   }
 }
