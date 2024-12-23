@@ -20,4 +20,8 @@ class StringConvert {
       return text;
     }
   }
+
+  static String toUrlScheme(String hostScheme) {
+    return '$hostScheme://';
+  }
 }
