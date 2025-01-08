@@ -15,7 +15,7 @@ class BottomBarComposerWidgetStyle {
   static const Color iconColor = AppColor.steelGrayA540;
   static const Color sendButtonBackgroundColor = AppColor.blue700;
   static const Color selectedBackgroundColor = AppColor.colorSelected;
-  static const Color selectedIconColor = AppColor.primaryColor;
+  static const Color selectedIconColor = AppColor.steelGrayA540;
 
   static const EdgeInsetsGeometry padding = EdgeInsetsDirectional.symmetric(horizontal: 32);
   static const EdgeInsetsGeometry iconPadding = EdgeInsetsDirectional.all(5);
