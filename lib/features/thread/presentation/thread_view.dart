@@ -804,9 +804,7 @@ class ThreadView extends GetWidget<ThreadController>
           : EdgeInsets.zero)
       ..onActionClick((email) {
         popBack();
-        controller.mailboxDashBoardController.goToComposer(
-          ComposerArguments.fromPresentationEmail(email)
-        );
+        controller.editAsNewEmail(email);
       })
     ).build();
   }
@@ -915,9 +913,7 @@ class ThreadView extends GetWidget<ThreadController>
         ),
         onCallbackAction: () {
           popBack();
-          controller.mailboxDashBoardController.goToComposer(
-            ComposerArguments.fromPresentationEmail(email)
-          );
+          controller.editAsNewEmail(email);
         }
       )
     );
