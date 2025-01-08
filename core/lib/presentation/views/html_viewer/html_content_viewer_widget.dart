@@ -22,6 +22,8 @@ class HtmlContentViewer extends StatefulWidget {
   final String contentHtml;
   final double? initialWidth;
   final TextDirection? direction;
+  final double? contentPadding;
+  final bool useDefaultFont;
 
   final OnLoadWidthHtmlViewerAction? onLoadWidthHtmlViewer;
   final OnMailtoDelegateAction? onMailtoDelegateAction;
@@ -32,6 +34,8 @@ class HtmlContentViewer extends StatefulWidget {
     required this.contentHtml,
     this.initialWidth,
     this.direction,
+    this.contentPadding,
+    this.useDefaultFont = false,
     this.onLoadWidthHtmlViewer,
     this.onMailtoDelegateAction,
     this.onScrollHorizontalEnd
@@ -96,7 +100,9 @@ class _HtmlContentViewState extends State<HtmlContentViewer> {
     _htmlData = HtmlUtils.generateHtmlDocument(
       content: widget.contentHtml,
       direction: widget.direction,
-      javaScripts: _customScripts
+      javaScripts: _customScripts,
+      contentPadding: widget.contentPadding,
+      useDefaultFont: widget.useDefaultFont,
     );
   }
 

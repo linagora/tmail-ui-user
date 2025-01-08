@@ -17,6 +17,8 @@ class HtmlContentViewerOnWeb extends StatefulWidget {
   final double widthContent;
   final double heightContent;
   final TextDirection? direction;
+  final double? contentPadding;
+  final bool useDefaultFont;
 
   /// Handler for mailto: links
   final Function(Uri?)? mailtoDelegate;
@@ -30,8 +32,10 @@ class HtmlContentViewerOnWeb extends StatefulWidget {
     required this.widthContent,
     required this.heightContent,
     this.allowResizeToDocumentSize = true,
+    this.useDefaultFont = false,
     this.mailtoDelegate,
     this.direction,
+    this.contentPadding,
   }) : super(key: key);
 
   @override
@@ -218,7 +222,10 @@ class _HtmlContentViewerOnWebState extends State<HtmlContentViewerOnWeb> {
       minWidth: _minWidth,
       styleCSS: HtmlTemplate.tooltipLinkCss,
       javaScripts: webViewActionScripts + scriptsDisableZoom + HtmlInteraction.scriptsHandleLazyLoadingBackgroundImage,
-      direction: widget.direction);
+      direction: widget.direction,
+      contentPadding: widget.contentPadding,
+      useDefaultFont: widget.useDefaultFont,
+    );
 
     return htmlTemplate;
   }
