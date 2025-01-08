@@ -47,11 +47,11 @@ class BottomBarComposerWidget extends StatelessWidget {
           TMailButtonWidget.fromIcon(
             icon: _imagePaths.icRichToolbar,
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
-            padding: BottomBarComposerWidgetStyle.richTextIconPadding,
+            padding: BottomBarComposerWidgetStyle.iconPadding,
             backgroundColor: isFormattingOptionsEnabled
               ? BottomBarComposerWidgetStyle.selectedBackgroundColor
               : Colors.transparent,
-            iconSize: BottomBarComposerWidgetStyle.richTextIconSize,
+            iconSize: BottomBarComposerWidgetStyle.iconSize,
             iconColor: isFormattingOptionsEnabled
               ? BottomBarComposerWidgetStyle.selectedIconColor
               : BottomBarComposerWidgetStyle.iconColor,
@@ -104,6 +104,8 @@ class BottomBarComposerWidget extends StatelessWidget {
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             padding: BottomBarComposerWidgetStyle.iconPadding,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
+            iconColor: BottomBarComposerWidgetStyle.iconColor,
+            backgroundColor: Colors.transparent,
             tooltipMessage: AppLocalizations.of(context).delete,
             onTapActionCallback: deleteComposerAction,
           ),
@@ -116,6 +118,7 @@ class BottomBarComposerWidget extends StatelessWidget {
             iconColor: hasReadReceipt
               ? BottomBarComposerWidgetStyle.selectedIconColor
               : BottomBarComposerWidgetStyle.iconColor,
+            backgroundColor: Colors.transparent,
             tooltipMessage: hasReadReceipt
               ? AppLocalizations.of(context).turnOffRequestReadReceipt
               : AppLocalizations.of(context).turnOnRequestReadReceipt,
@@ -127,6 +130,8 @@ class BottomBarComposerWidget extends StatelessWidget {
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             padding: BottomBarComposerWidgetStyle.iconPadding,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
+            iconColor: BottomBarComposerWidgetStyle.iconColor,
+            backgroundColor: Colors.transparent,
             tooltipMessage: AppLocalizations.of(context).saveAsDraft,
             onTapActionCallback: saveToDraftAction,
           ),
