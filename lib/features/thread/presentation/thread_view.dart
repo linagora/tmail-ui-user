@@ -771,10 +771,10 @@ class ThreadView extends GetWidget<ThreadController>
         AppLocalizations.of(context).archiveMessage,
         email,
         iconLeftPadding: controller.responsiveUtils.isMobile(context)
-          ? const EdgeInsets.only(left: 12, right: 16)
-          : const EdgeInsets.only(right: 12),
+          ? const EdgeInsetsDirectional.only(start: 12, end: 16)
+          : const EdgeInsetsDirectional.only(end: 12),
         iconRightPadding: controller.responsiveUtils.isMobile(context)
-          ? const EdgeInsets.only(right: 12)
+          ? const EdgeInsetsDirectional.only(start: 12)
           : EdgeInsets.zero
       )
       ..onActionClick((email) => controller.archiveMessage(context, email))
@@ -798,10 +798,10 @@ class ThreadView extends GetWidget<ThreadController>
         AppLocalizations.of(context).editAsNewEmail,
         email,
         iconLeftPadding: controller.responsiveUtils.isMobile(context)
-          ? const EdgeInsets.only(left: 12, right: 16)
-          : const EdgeInsets.only(right: 12),
+          ? const EdgeInsetsDirectional.only(start: 12, end: 16)
+          : const EdgeInsetsDirectional.only(end: 12),
         iconRightPadding: controller.responsiveUtils.isMobile(context)
-          ? const EdgeInsets.only(right: 12)
+          ? const EdgeInsetsDirectional.only(start: 12)
           : EdgeInsets.zero)
       ..onActionClick((email) {
         popBack();
