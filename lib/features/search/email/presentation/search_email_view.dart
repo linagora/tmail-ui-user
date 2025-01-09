@@ -747,7 +747,8 @@ class SearchEmailView extends GetWidget<SearchEmailController>
   List<Widget> _contextMenuActionTile(BuildContext context, PresentationEmail email) {
     return <Widget>[
       _markAsEmailSpamOrUnSpamAction(context, email),
-      _editAsNewEmailContextMenuItemAction(context, email),
+      if (email.mailboxContain?.isDrafts == false)
+        _editAsNewEmailContextMenuItemAction(context, email),
     ];
   }
 
@@ -814,9 +815,10 @@ class SearchEmailView extends GetWidget<SearchEmailController>
       PopupMenuItem(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: _markAsEmailSpamOrUnSpamAction(context, email)),
-      PopupMenuItem(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: _editAsNewEmailContextMenuItemAction(context, email)),
+      if (email.mailboxContain?.isDrafts == false)
+        PopupMenuItem(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _editAsNewEmailContextMenuItemAction(context, email)),
     ];
   }
 
