@@ -225,9 +225,8 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
   Widget _buildThreadViewForWebDesktop(BuildContext context) {
     return Container(
       margin: const EdgeInsetsDirectional.only(end: 16, bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-        border: Border.all(color: AppColor.colorBorderBodyThread, width: 1),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
         color: Colors.white),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -240,6 +239,7 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
                 child: TopBarThreadSelection(
                   listEmailSelected,
                   controller.mapMailboxById,
+                  controller.imagePaths,
                   onCancelSelection: () =>
                     controller.dispatchAction(CancelSelectionAllEmailAction()),
                   onEmailActionTypeAction: (listEmails, actionType) =>
@@ -700,13 +700,7 @@ class MailboxDashBoardView extends BaseMailboxDashBoardView {
         iconSize: 24,
         iconColor: Colors.white,
         padding: const EdgeInsetsDirectional.symmetric(vertical: 8),
-        backgroundColor: AppColor.colorTextButton,
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 12.0,
-            color: AppColor.colorShadowComposerButton
-          )
-        ],
+        backgroundColor: AppColor.blue700,
         textStyle: const TextStyle(
           fontSize: 15,
           color: Colors.white,
