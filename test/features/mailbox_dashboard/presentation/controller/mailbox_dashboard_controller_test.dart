@@ -400,6 +400,7 @@ void main() {
     () async {
       // arrange
       when(context.owner).thenReturn(BuildOwner(focusManager: FocusManager()));
+      when(context.mounted).thenReturn(true);
       
       // expect query in search controller update as expected
       mailboxDashboardController.searchEmailByQueryString(queryString);
@@ -454,6 +455,7 @@ void main() {
       const emailNotContainsWord = 'test not word';
       // arrange
       when(context.owner).thenReturn(BuildOwner(focusManager: FocusManager()));
+      when(context.mounted).thenReturn(true);
 
       // expect query in advanced filter controller update as expected
       advancedFilterController.updateListEmailAddress(AdvancedSearchFilterField.from, [fromEmailAddress]);
