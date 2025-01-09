@@ -1127,6 +1127,9 @@ class ThreadController extends BaseController with EmailActionController {
       case EmailActionType.preview:
         if (mailboxContain?.isDrafts == true) {
           editDraftEmail(selectedEmail);
+        } else if (mailboxContain?.isTemplates == true) {
+          popBack();
+          editAsNewEmail(selectedEmail);
         } else {
           previewEmail(selectedEmail);
         }
