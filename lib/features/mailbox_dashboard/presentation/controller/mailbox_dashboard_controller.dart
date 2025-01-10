@@ -2726,6 +2726,10 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     return false;
   }
 
+  bool hasArchiveMailbox() {
+    return getMailboxIdByRole(PresentationMailbox.roleArchive) != null;
+  }
+
   void archiveMessage(BuildContext context, PresentationEmail email) {
     final mailboxContain = email.findMailboxContain(mapMailboxById);
     if (mailboxContain != null) {
@@ -2743,6 +2747,28 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
           sessionCurrent!,
           accountId.value!,
           moveToArchiveMailboxRequest
+        );
+      }
+    }
+  }
+
+  void moveMessageToTrash(BuildContext context, PresentationEmail email) {
+    final mailboxContain = email.findMailboxContain(mapMailboxById);
+    if (mailboxContain != null) {
+      final trashMailboxId = getMailboxIdByRole(PresentationMailbox.roleTrash);
+      final trashMailboxPath = mapMailboxById[trashMailboxId]?.getDisplayName(context);
+      if (trashMailboxId != null) {
+        final moveToTrashMailboxRequest = MoveToMailboxRequest(
+            {mailboxContain.id: [email.id!]},
+            trashMailboxId,
+            MoveAction.moving,
+            EmailActionType.moveToMailbox,
+            destinationPath: trashMailboxPath
+        );
+        moveToMailbox(
+            sessionCurrent!,
+            accountId.value!,
+            moveToTrashMailboxRequest
         );
       }
     }
