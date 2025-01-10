@@ -368,4 +368,11 @@ class EmailDataSourceImpl extends EmailDataSource {
         eventActionType);
     }).catchError(_exceptionThrower.throwException);
   }
+
+  @override
+  Future<List<Email>> parseEmailByBlobIds(AccountId accountId, Set<Id> blobIds) {
+    return Future.sync(() async {
+      return await emailAPI.parseEmailByBlobIds(accountId, blobIds);
+    }).catchError(_exceptionThrower.throwException);
+  }
 }

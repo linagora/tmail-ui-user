@@ -476,4 +476,9 @@ class EmailHiveCacheDataSourceImpl extends EmailDataSource {
   Future<Email> storeEventAttendanceStatus(Session session, AccountId accountId, EmailId emailId, EventActionType eventActionType) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<Email>> parseEmailByBlobIds(AccountId accountId, Set<Id> blobIds) {
+    throw UnimplementedError();
+  }
 }
