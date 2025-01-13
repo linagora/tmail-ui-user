@@ -4294,4 +4294,24 @@ class AppLocalizations {
     );
   }
 
+  String get parseEmailByBlobIdFailed {
+    return Intl.message(
+      'Cannot parse email by blob id',
+      name: 'parseEmailByBlobIdFailed',
+    );
+  }
+
+  String get previewEmailFromEMLFileFailed {
+    return Intl.message(
+      'Cannot preview this eml file',
+      name: 'previewEmailFromEMLFileFailed',
+    );
+  }
+
+  String get cannotOpenNewWindow {
+    return Intl.message(
+      'Cannot open new window',
+      name: 'cannotOpenNewWindow',
+    );
+  }
 }

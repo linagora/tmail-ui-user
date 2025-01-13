@@ -1,3 +1,4 @@
+import 'package:core/domain/exceptions/web_session_exception.dart';
 import 'package:core/presentation/state/failure.dart';
 import 'package:core/presentation/utils/app_toast.dart';
 import 'package:core/utils/app_logger.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:model/email/email_action_type.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_action.dart';
+import 'package:tmail_ui_user/features/email/domain/state/parse_email_by_blob_id_state.dart';
+import 'package:tmail_ui_user/features/email/domain/state/preview_email_from_eml_file_state.dart';
 import 'package:tmail_ui_user/features/home/data/exceptions/session_exceptions.dart';
 import 'package:tmail_ui_user/features/home/domain/state/get_session_state.dart';
 import 'package:tmail_ui_user/features/login/data/network/oidc_error.dart';
@@ -83,6 +86,14 @@ class ToastManager {
         message = exception.message;
       } else {
         message = AppLocalizations.of(currentContext!).createTwakeIdFailed;
+      }
+    } else if (failure is ParseEmailByBlobIdFailure) {
+      message = AppLocalizations.of(currentContext!).parseEmailByBlobIdFailed;
+    } else if (failure is PreviewEmailFromEmlFileFailure) {
+      if (failure.exception is CannotOpenNewWindowException) {
+        message = AppLocalizations.of(currentContext!).cannotOpenNewWindow;
+      } else {
+        message = AppLocalizations.of(currentContext!).previewEmailFromEMLFileFailed;
       }
     }
 
