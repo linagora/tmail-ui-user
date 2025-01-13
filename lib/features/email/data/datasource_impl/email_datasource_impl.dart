@@ -442,7 +442,7 @@ class EmailDataSourceImpl extends EmailDataSource {
           final iconBase64Data = await _fileUtils.convertImageAssetToBase64(
             attachment.getIcon(_imagePaths));
 
-          final link = attachment.isEMLFile
+          final link = attachment.isEMLFile && PlatformInfo.isWeb
             ? RouteUtils.createUrlWebLocationBar(
                 AppRoutes.emailEMLPreviewer,
                 previewId: attachment.blobId?.value,
@@ -516,7 +516,7 @@ class EmailDataSourceImpl extends EmailDataSource {
   }
 
   @override
-  Future<void> sharePreviewEmailEMLContent(String keyStored, EMLPreviewer emlPreviewer) {
+  Future<void> sharePreviewEmailEMLContent(EMLPreviewer emlPreviewer) {
     throw UnimplementedError();
   }
 
@@ -526,7 +526,7 @@ class EmailDataSourceImpl extends EmailDataSource {
   }
 
   @override
-  Future<void> storePreviewEMLContentToSessionStorage(String keyStored, EMLPreviewer emlPreviewer) {
+  Future<void> storePreviewEMLContentToSessionStorage(EMLPreviewer emlPreviewer) {
     throw UnimplementedError();
   }
 
