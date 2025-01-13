@@ -200,10 +200,15 @@ class SearchMailboxView extends GetWidget<SearchMailboxController>
         controller.dashboardController.sessionCurrent,
         controller.dashboardController.accountId.value);
 
+    final bool deletedMessageVaultSupported = MailboxWidgetMixin.isDeletedMessageVaultSupported(
+        controller.dashboardController.sessionCurrent,
+        controller.dashboardController.accountId.value);
+
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.dashboardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
     return contextMenuActions
       .map((action) => _mailboxFocusedMenuItem(context, action, mailbox))
@@ -261,10 +266,15 @@ class SearchMailboxView extends GetWidget<SearchMailboxController>
         controller.dashboardController.sessionCurrent,
         controller.dashboardController.accountId.value);
 
+    final bool deletedMessageVaultSupported = MailboxWidgetMixin.isDeletedMessageVaultSupported(
+        controller.dashboardController.sessionCurrent,
+        controller.dashboardController.accountId.value);
+
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.dashboardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
 
     if (contextMenuActions.isEmpty) {

@@ -1,6 +1,7 @@
 
 import 'package:core/core.dart';
 import 'package:core/utils/direction_utils.dart';
+import 'package:email_recovery/email_recovery/capability_deleted_messages_vault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,8 @@ mixin MailboxWidgetMixin {
 
   List<MailboxActions> _listActionForDefaultMailbox(
     PresentationMailbox mailbox,
-    bool spamReportEnabled
+    bool spamReportEnabled,
+    bool deletedMessageVaultSupported
   ) {
 
     return [
@@ -41,7 +43,8 @@ mixin MailboxWidgetMixin {
       if (mailbox.isTrash)
         ...[
           MailboxActions.emptyTrash,
-          MailboxActions.recoverDeletedMessages
+          if (deletedMessageVaultSupported)
+            MailboxActions.recoverDeletedMessages,
         ]
       else if (mailbox.isSpam)
         ...[
@@ -96,10 +99,11 @@ mixin MailboxWidgetMixin {
   List<MailboxActions> _listActionForAllMailboxType(
     PresentationMailbox mailbox,
     bool spamReportEnabled,
-    bool subaddressingSupported
+    bool subaddressingSupported,
+    bool deletedMessageVaultSupported
   ) {
     if (mailbox.isDefault) {
-      return _listActionForDefaultMailbox(mailbox, spamReportEnabled);
+      return _listActionForDefaultMailbox(mailbox, spamReportEnabled, deletedMessageVaultSupported);
     } else if (mailbox.isPersonal) {
       return _listActionForPersonalMailbox(mailbox, subaddressingSupported);
     } else {
@@ -117,10 +121,15 @@ mixin MailboxWidgetMixin {
         controller.mailboxDashBoardController.sessionCurrent,
         controller.mailboxDashBoardController.accountId.value);
 
+    final bool deletedMessageVaultSupported = isDeletedMessageVaultSupported(
+        controller.mailboxDashBoardController.sessionCurrent,
+        controller.mailboxDashBoardController.accountId.value);
+
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.mailboxDashBoardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
 
     if (contextMenuActions.isEmpty) {
@@ -192,9 +201,10 @@ mixin MailboxWidgetMixin {
   List<ContextMenuItemMailboxAction> listContextMenuItemAction(
     PresentationMailbox mailbox,
     bool spamReportEnabled,
-    bool subaddressingSupported
+    bool subaddressingSupported,
+    bool deletedMessageVaultSupported
   ) {
-    final mailboxActionsSupported = _listActionForAllMailboxType(mailbox, spamReportEnabled, subaddressingSupported);
+    final mailboxActionsSupported = _listActionForAllMailboxType(mailbox, spamReportEnabled, subaddressingSupported, deletedMessageVaultSupported);
 
     final listContextMenuItemAction = mailboxActionsSupported
       .map((action) => ContextMenuItemMailboxAction(action, action.getContextMenuItemState(mailbox)))
@@ -215,10 +225,15 @@ mixin MailboxWidgetMixin {
       controller.mailboxDashBoardController.sessionCurrent,
       controller.mailboxDashBoardController.accountId.value);
 
+    final bool deletedMessageVaultSupported = isDeletedMessageVaultSupported(
+        controller.mailboxDashBoardController.sessionCurrent,
+        controller.mailboxDashBoardController.accountId.value);
+
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.mailboxDashBoardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
 
     if (contextMenuActions.isEmpty) {
@@ -283,6 +298,13 @@ mixin MailboxWidgetMixin {
         ?.props[0] as Map<String, dynamic>?)
         ?[subaddressingSupported]
         ?? false;
+  }
+
+  static bool isDeletedMessageVaultSupported(Session? session, AccountId? accountId) {
+    if (session == null || accountId == null) {
+      return false;
+    }
+    return capabilityDeletedMessagesVault.isSupported(session, accountId);
   }
 
   PopupMenuItem _buildPopupMenuItem(
