@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2024-12-12T15:50:46.911821",
+  "@@last_modified": "2025-01-16T15:36:00.389145",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -119,6 +119,16 @@
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
+  },
+  "unexpectedError": "Unexpected error: {errorMessage}",
+  "@unexpectedError": {
+    "type": "text",
+    "placeholders_order": [
+      "errorMessage"
+    ],
+    "placeholders": {
+      "errorMessage": {}
+    }
   },
   "search_folder": "Search folder",
   "@search_folder": {

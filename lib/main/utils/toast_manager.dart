@@ -46,7 +46,11 @@ class ToastManager {
     } else if (exception is NoNetworkError) {
       return AppLocalizations.of(context).youAreOffline;
     } else {
-      return null;
+      try {
+        return AppLocalizations.of(context).unexpectedError(exception.message);
+      } catch(_) {
+        return AppLocalizations.of(context).unexpectedError(exception.toString());
+      }
     }
   }
 
