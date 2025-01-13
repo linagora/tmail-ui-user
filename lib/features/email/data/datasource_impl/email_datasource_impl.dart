@@ -513,4 +513,19 @@ class EmailDataSourceImpl extends EmailDataSource {
   Future<String> getPreviewEmailEMLContentShared(String keyStored) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> storePreviewEMLContentToSessionStorage(String keyStored, String content) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> removePreviewEmailEMLContentShared(String keyStored) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getPreviewEMLContentInMemory(String keyStored) {
+    throw UnimplementedError();
+  }
 }
