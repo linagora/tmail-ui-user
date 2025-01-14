@@ -7,10 +7,10 @@ import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:jmap_dart_client/jmap/core/state.dart';
 import 'package:jmap_dart_client/jmap/core/user_name.dart';
-import 'package:tmail_ui_user/features/mailbox/presentation/mixin/mailbox_widget_mixin.dart';
+import 'package:tmail_ui_user/features/mailbox/presentation/utils/mailbox_utils.dart';
 
 void main() {
-  group('MailboxWidgetMixin::isSubaddressingSupported::test', () {
+  group('MailboxUtils::isSubaddressingSupported::test', () {
 
     test(
         'should return true '
@@ -24,7 +24,7 @@ void main() {
               {}, UserName(''), Uri(), Uri(), Uri(), Uri(), State(''));
 
           // act
-          final subaddressingSupported = MailboxWidgetMixin.isSubaddressingSupported(session, AccountId(Id("1")));
+          final subaddressingSupported = MailboxUtils.isSubaddressingSupported(session, AccountId(Id("1")));
 
           // assert
           expect(subaddressingSupported, true);
@@ -42,7 +42,7 @@ void main() {
               {}, UserName(''), Uri(), Uri(), Uri(), Uri(), State(''));
 
           // act
-          final subaddressingSupported = MailboxWidgetMixin.isSubaddressingSupported(session, AccountId(Id("1")));
+          final subaddressingSupported = MailboxUtils.isSubaddressingSupported(session, AccountId(Id("1")));
 
           // assert
           expect(subaddressingSupported, false);
@@ -60,7 +60,7 @@ void main() {
               {}, UserName(''), Uri(), Uri(), Uri(), Uri(), State(''));
 
           // act
-          final subaddressingSupported = MailboxWidgetMixin.isSubaddressingSupported(session, AccountId(Id("1")));
+          final subaddressingSupported = MailboxUtils.isSubaddressingSupported(session, AccountId(Id("1")));
 
           // assert
           expect(subaddressingSupported, false);

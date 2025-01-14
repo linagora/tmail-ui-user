@@ -1,14 +1,9 @@
 
 import 'package:core/core.dart';
 import 'package:core/utils/direction_utils.dart';
-import 'package:email_recovery/email_recovery/capability_deleted_messages_vault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:jmap_dart_client/jmap/account_id.dart';
-import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
-import 'package:jmap_dart_client/jmap/core/session/session.dart';
-import 'package:model/mailbox/mailbox_constants.dart';
 import 'package:model/model.dart';
 import 'package:tmail_ui_user/features/base/base_mailbox_controller.dart';
 import 'package:tmail_ui_user/features/base/widget/popup_item_widget.dart';
@@ -16,9 +11,9 @@ import 'package:tmail_ui_user/features/mailbox/presentation/mailbox_controller.d
 import 'package:tmail_ui_user/features/mailbox/presentation/model/context_item_mailbox_action.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/model/mailbox_actions.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/model/mailbox_categories.dart';
+import 'package:tmail_ui_user/features/mailbox/presentation/utils/mailbox_utils.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/widgets/mailbox_bottom_sheet_action_tile_builder.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/widgets/app_dashboard/app_list_dashboard_item.dart';
-import 'package:tmail_ui_user/main/error/capability_validator.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 
 mixin MailboxWidgetMixin {
@@ -117,11 +112,11 @@ mixin MailboxWidgetMixin {
     PresentationMailbox mailbox,
     MailboxController controller
   ) {
-    final bool subaddressingSupported = isSubaddressingSupported(
+    final bool subaddressingSupported = MailboxUtils.isSubaddressingSupported(
         controller.mailboxDashBoardController.sessionCurrent,
         controller.mailboxDashBoardController.accountId.value);
 
-    final bool deletedMessageVaultSupported = isDeletedMessageVaultSupported(
+    final bool deletedMessageVaultSupported = MailboxUtils.isDeletedMessageVaultSupported(
         controller.mailboxDashBoardController.sessionCurrent,
         controller.mailboxDashBoardController.accountId.value);
 
@@ -221,11 +216,11 @@ mixin MailboxWidgetMixin {
     PresentationMailbox mailbox,
     MailboxController controller
   ) {
-    final bool subaddressingSupported = isSubaddressingSupported(
+    final bool subaddressingSupported = MailboxUtils.isSubaddressingSupported(
       controller.mailboxDashBoardController.sessionCurrent,
       controller.mailboxDashBoardController.accountId.value);
 
-    final bool deletedMessageVaultSupported = isDeletedMessageVaultSupported(
+    final bool deletedMessageVaultSupported = MailboxUtils.isDeletedMessageVaultSupported(
         controller.mailboxDashBoardController.sessionCurrent,
         controller.mailboxDashBoardController.accountId.value);
 
@@ -284,27 +279,6 @@ mixin MailboxWidgetMixin {
         handleMailboxAction: handleMailboxAction
       ))
       .toList();
-  }
-
-  static bool isSubaddressingSupported(Session? session, AccountId? accountId) {
-    if (session == null || accountId == null) {
-      return false;
-    }
-    if (!CapabilityIdentifier.jmapTeamMailboxes.isSupported(session, accountId)) {
-      return false;
-    }
-
-    return (session.getCapabilityProperties(accountId, CapabilityIdentifier.jmapTeamMailboxes)
-        ?.props[0] as Map<String, dynamic>?)
-        ?[subaddressingSupported]
-        ?? false;
-  }
-
-  static bool isDeletedMessageVaultSupported(Session? session, AccountId? accountId) {
-    if (session == null || accountId == null) {
-      return false;
-    }
-    return capabilityDeletedMessagesVault.isSupported(session, accountId);
   }
 
   PopupMenuItem _buildPopupMenuItem(
