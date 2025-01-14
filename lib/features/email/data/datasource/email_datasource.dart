@@ -24,7 +24,9 @@ import 'package:tmail_ui_user/features/composer/domain/model/email_request.dart'
 import 'package:tmail_ui_user/features/email/domain/model/detailed_email.dart';
 import 'package:tmail_ui_user/features/email/domain/model/event_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_to_mailbox_request.dart';
+import 'package:tmail_ui_user/features/email/domain/model/preview_email_eml_request.dart';
 import 'package:tmail_ui_user/features/email/domain/model/restore_deleted_message_request.dart';
+import 'package:tmail_ui_user/features/email/presentation/model/eml_previewer.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/model/create_new_mailbox_request.dart';
 import 'package:tmail_ui_user/features/sending_queue/domain/model/sending_email.dart';
 
@@ -175,4 +177,18 @@ abstract class EmailDataSource {
     AccountId accountId,
     EmailId emailId,
     EventActionType eventActionType);
+
+  Future<List<Email>> parseEmailByBlobIds(AccountId accountId, Set<Id> blobIds);
+
+  Future<String> generatePreviewEmailEMLContent(PreviewEmailEMLRequest previewEmailEMLRequest);
+
+  Future<void> sharePreviewEmailEMLContent(EMLPreviewer emlPreviewer);
+
+  Future<EMLPreviewer> getPreviewEmailEMLContentShared(String keyStored);
+
+  Future<void> removePreviewEmailEMLContentShared(String keyStored);
+
+  Future<void> storePreviewEMLContentToSessionStorage(EMLPreviewer emlPreviewer);
+
+  Future<EMLPreviewer> getPreviewEMLContentInMemory(String keyStored);
 }

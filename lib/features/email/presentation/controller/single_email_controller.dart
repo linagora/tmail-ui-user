@@ -7,10 +7,12 @@ import 'package:core/core.dart';
 import 'package:core/presentation/utils/html_transformer/text/sanitize_autolink_unescape_html_transformer.dart';
 import 'package:core/presentation/utils/html_transformer/text/new_line_transformer.dart';
 import 'package:core/presentation/utils/html_transformer/text/standardize_html_sanitizing_transformers.dart';
+import 'package:core/utils/html/html_utils.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
@@ -46,6 +48,7 @@ import 'package:tmail_ui_user/features/email/domain/model/event_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/mark_read_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_to_mailbox_request.dart';
+import 'package:tmail_ui_user/features/email/domain/model/preview_email_eml_request.dart';
 import 'package:tmail_ui_user/features/email/domain/model/send_receipt_to_sender_request.dart';
 import 'package:tmail_ui_user/features/email/domain/state/calendar_event_accept_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/calendar_event_maybe_state.dart';
@@ -59,6 +62,8 @@ import 'package:tmail_ui_user/features/email/domain/state/mark_as_email_read_sta
 import 'package:tmail_ui_user/features/email/domain/state/mark_as_email_star_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/move_to_mailbox_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/parse_calendar_event_state.dart';
+import 'package:tmail_ui_user/features/email/domain/state/parse_email_by_blob_id_state.dart';
+import 'package:tmail_ui_user/features/email/domain/state/preview_email_from_eml_file_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/print_email_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/send_receipt_to_sender_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/store_event_attendance_status_state.dart';
@@ -74,6 +79,8 @@ import 'package:tmail_ui_user/features/email/domain/usecases/get_email_content_i
 import 'package:tmail_ui_user/features/email/domain/usecases/mark_as_email_read_interactor.dart';
 import 'package:tmail_ui_user/features/email/domain/usecases/move_to_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/email/domain/usecases/parse_calendar_event_interactor.dart';
+import 'package:tmail_ui_user/features/email/domain/usecases/parse_email_by_blob_id_interactor.dart';
+import 'package:tmail_ui_user/features/email/domain/usecases/preview_email_from_eml_file_interactor.dart';
 import 'package:tmail_ui_user/features/email/domain/usecases/print_email_interactor.dart';
 import 'package:tmail_ui_user/features/email/domain/usecases/send_receipt_to_sender_interactor.dart';
 import 'package:tmail_ui_user/features/email/domain/usecases/store_event_attendance_status_interactor.dart';
@@ -86,12 +93,14 @@ import 'package:tmail_ui_user/features/email/presentation/model/blob_calendar_ev
 import 'package:tmail_ui_user/features/email/presentation/model/composer_arguments.dart';
 import 'package:tmail_ui_user/features/email/presentation/model/email_loaded.dart';
 import 'package:tmail_ui_user/features/email/presentation/model/email_unsubscribe.dart';
+import 'package:tmail_ui_user/features/email/presentation/model/eml_previewer.dart';
 import 'package:tmail_ui_user/features/email/presentation/utils/email_utils.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/attachment_list/attachment_list_bottom_sheet_builder.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/attachment_list/attachment_list_dialog_builder.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/email_address_bottom_sheet_builder.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/email_address_dialog_builder.dart';
 import 'package:tmail_ui_user/features/email/presentation/widgets/pdf_viewer/pdf_viewer.dart';
+import 'package:tmail_ui_user/features/email_previewer/email_previewer_dialog_view.dart';
 import 'package:tmail_ui_user/features/home/data/exceptions/session_exceptions.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/action/mailbox_ui_action.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/model/mailbox_actions.dart';
@@ -138,6 +147,8 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   final StoreOpenedEmailInteractor _storeOpenedEmailInteractor;
   final PrintEmailInteractor _printEmailInteractor;
   final StoreEventAttendanceStatusInteractor _storeEventAttendanceStatusInteractor;
+  final ParseEmailByBlobIdInteractor _parseEmailByBlobIdInteractor;
+  final PreviewEmailFromEmlFileInteractor _previewEmailFromEmlFileInteractor;
 
   CreateNewEmailRuleFilterInteractor? _createNewEmailRuleFilterInteractor;
   SendReceiptToSenderInteractor? _sendReceiptToSenderInteractor;
@@ -191,6 +202,8 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
     this._storeOpenedEmailInteractor,
     this._printEmailInteractor,
     this._storeEventAttendanceStatusInteractor,
+    this._parseEmailByBlobIdInteractor,
+    this._previewEmailFromEmlFileInteractor,
   );
 
   @override
@@ -246,6 +259,10 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       calendarEventSuccess(success);
     } else if (success is StoreEventAttendanceStatusSuccess) {
       _showToastMessageEventAttendanceSuccess(success);
+    } else if (success is ParseEmailByBlobIdSuccess) {
+      _handleParseEmailByBlobIdSuccess(success);
+    } else if (success is PreviewEmailFromEmlFileSuccess) {
+      _handlePreviewEmailFromEMLFileSuccess(success);
     }
   }
 
@@ -269,6 +286,10 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
     } else if (failure is CalendarEventReplyFailure
         || failure is StoreEventAttendanceStatusFailure) {
       _calendarEventFailure(failure);
+    } else if (failure is ParseEmailByBlobIdFailure) {
+      _handleParseEmailByBlobIdFailure(failure);
+    } else if (failure is PreviewEmailFromEmlFileFailure) {
+      _handlePreviewEmailFromEMLFileFailure(failure);
     }
   }
 
@@ -1896,16 +1917,12 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   }
 
   void handleViewAttachmentAction(BuildContext context, Attachment attachment) {
-    if (PlatformInfo.isWeb) {
-      if (PlatformInfo.isCanvasKit && attachment.validatePDFIcon()) {
-        previewPDFFileAction(context, attachment);
-      } else {
-        downloadAttachmentForWeb(attachment);
-      }
-    } else if (PlatformInfo.isMobile) {
-      exportAttachment(context, attachment);
+    if (PlatformInfo.isWeb && PlatformInfo.isCanvasKit && attachment.isPDFFile) {
+      previewPDFFileAction(context, attachment);
+    } else if (attachment.isEMLFile) {
+      previewEMLFileAction(attachment.blobId, AppLocalizations.of(context));
     } else {
-      log('EmailView::_handleViewAttachmentAction: THE PLATFORM IS SUPPORTED');
+      handleDownloadAttachmentAction(context, attachment);
     }
   }
 
@@ -1934,6 +1951,141 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
         );
       },
     );
+  }
+
+  void previewEMLFileAction(Id? blobId, AppLocalizations appLocalizations) {
+    SmartDialog.showLoading(
+      msg: appLocalizations.loadingPleaseWait,
+      maskColor: Colors.black38,
+    );
+
+    if (accountId == null) {
+      consumeState(Stream.value(Left(ParseEmailByBlobIdFailure(NotFoundAccountIdException()))));
+      return;
+    }
+
+    if (blobId == null) {
+      consumeState(Stream.value(Left(ParseEmailByBlobIdFailure(NotFoundBlobIdException([])))));
+      return;
+    }
+
+    consumeState(_parseEmailByBlobIdInteractor.execute(accountId!, blobId));
+  }
+
+  void _handleParseEmailByBlobIdSuccess(ParseEmailByBlobIdSuccess success) {
+    if (session == null) {
+      consumeState(Stream.value(Left(PreviewEmailFromEmlFileFailure(NotFoundSessionException()))));
+      return;
+    }
+
+    if (accountId == null) {
+      consumeState(Stream.value(Left(PreviewEmailFromEmlFileFailure(NotFoundAccountIdException()))));
+      return;
+    }
+
+    if (currentContext == null) {
+      consumeState(Stream.value(Left(PreviewEmailFromEmlFileFailure(NotFoundContextException()))));
+      return;
+    }
+
+    consumeState(_previewEmailFromEmlFileInteractor.execute(
+      PreviewEmailEMLRequest(
+        accountId: accountId!,
+        userName: userName!,
+        blobId: success.blobId,
+        email: success.email,
+        locale: Localizations.localeOf(currentContext!),
+        appLocalizations: AppLocalizations.of(currentContext!),
+        baseDownloadUrl: session!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl),
+      ),
+    ));
+  }
+
+  void _handleParseEmailByBlobIdFailure(ParseEmailByBlobIdFailure failure) {
+    SmartDialog.dismiss();
+    toastManager.showMessageFailure(failure);
+  }
+
+  void _handlePreviewEmailFromEMLFileFailure(PreviewEmailFromEmlFileFailure failure) {
+    SmartDialog.dismiss();
+    toastManager.showMessageFailure(failure);
+  }
+
+  void _handlePreviewEmailFromEMLFileSuccess(PreviewEmailFromEmlFileSuccess success) {
+    SmartDialog.dismiss();
+
+    if (PlatformInfo.isWeb) {
+      bool isOpen = HtmlUtils.openNewWindowByUrl(
+        RouteUtils.createUrlWebLocationBar(
+          AppRoutes.emailEMLPreviewer,
+          previewId: success.emlPreviewer.id
+        ).toString(),
+      );
+
+      if (!isOpen) {
+        toastManager.showMessageFailure(PreviewEmailFromEmlFileFailure(CannotOpenNewWindowException()));
+      }
+    } else if (PlatformInfo.isMobile) {
+      if (currentContext == null) {
+        toastManager.showMessageFailure(PreviewEmailFromEmlFileFailure(NotFoundContextException()));
+        return;
+      }
+
+      showModalSheetToPreviewEMLAttachment(
+        currentContext!,
+        success.emlPreviewer);
+    }
+  }
+
+  void showModalSheetToPreviewEMLAttachment(
+    BuildContext context,
+    EMLPreviewer emlPreviewer,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (_) {
+        return DraggableScrollableSheet(
+          initialChildSize: 1.0,
+          builder: (context, ___) => EmailPreviewerDialogView(
+            emlPreviewer: emlPreviewer,
+            onMailtoDelegateAction: openMailToLink,
+            onPreviewEMLDelegateAction: (uri) => _openEMLPreviewer(context, uri),
+            onDownloadAttachmentDelegateAction: (uri) =>
+                _downloadAttachmentInEMLPreview(context, uri),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openEMLPreviewer(BuildContext context, Uri? uri) async {
+    log('SingleEmailController::_openEMLPreviewer:uri = $uri');
+    if (uri == null) return;
+
+    final blobId = uri.path;
+    log('SingleEmailController::_openEMLPreviewer:blobId = $blobId');
+    if (blobId.isEmpty) return;
+
+    previewEMLFileAction(Id(blobId), AppLocalizations.of(context));
+  }
+
+  Future<void> _downloadAttachmentInEMLPreview(BuildContext context, Uri? uri) async {
+    log('SingleEmailController::_downloadAttachmentInEMLPreview:uri = $uri');
+    if (uri == null) return;
+
+    final attachment = EmailUtils.parsingAttachmentByUri(uri);
+    if (attachment == null) return;
+
+    handleDownloadAttachmentAction(context, attachment);
   }
 
   void handleMailToAttendees(CalendarOrganizer? organizer, List<CalendarAttendee>? attendees) {

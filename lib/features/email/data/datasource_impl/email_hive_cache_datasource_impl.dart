@@ -34,7 +34,9 @@ import 'package:tmail_ui_user/features/email/domain/extensions/detailed_email_hi
 import 'package:tmail_ui_user/features/email/domain/model/detailed_email.dart';
 import 'package:tmail_ui_user/features/email/domain/model/event_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_to_mailbox_request.dart';
+import 'package:tmail_ui_user/features/email/domain/model/preview_email_eml_request.dart';
 import 'package:tmail_ui_user/features/email/domain/model/restore_deleted_message_request.dart';
+import 'package:tmail_ui_user/features/email/presentation/model/eml_previewer.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/model/create_new_mailbox_request.dart';
 import 'package:tmail_ui_user/features/offline_mode/extensions/list_sending_email_hive_cache_extension.dart';
 import 'package:tmail_ui_user/features/offline_mode/extensions/sending_email_hive_cache_extension.dart';
@@ -474,6 +476,41 @@ class EmailHiveCacheDataSourceImpl extends EmailDataSource {
 
   @override
   Future<Email> storeEventAttendanceStatus(Session session, AccountId accountId, EmailId emailId, EventActionType eventActionType) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Email>> parseEmailByBlobIds(AccountId accountId, Set<Id> blobIds) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> generatePreviewEmailEMLContent(PreviewEmailEMLRequest previewEmailEMLRequest) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> sharePreviewEmailEMLContent(EMLPreviewer emlPreviewer) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<EMLPreviewer> getPreviewEmailEMLContentShared(String keyStored) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> removePreviewEmailEMLContentShared(String keyStored) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> storePreviewEMLContentToSessionStorage(EMLPreviewer emlPreviewer) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<EMLPreviewer> getPreviewEMLContentInMemory(String keyStored) {
     throw UnimplementedError();
   }
 }

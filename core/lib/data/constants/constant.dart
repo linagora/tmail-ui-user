@@ -9,4 +9,8 @@ class Constant {
   static const imageType = 'image';
   static const textVCardMimeType = 'text/x-vcard';
   static const textPlainMimeType = 'text/plain';
+  static const emlMimeType = 'message/rfc822';
+  static const mailtoScheme = 'mailto';
+  static const attachmentScheme = 'attachment';
+  static const emlPreviewerScheme = 'eml-previewer';
 }

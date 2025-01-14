@@ -32,8 +32,10 @@ import 'package:tmail_ui_user/features/email/domain/model/detailed_email.dart';
 import 'package:tmail_ui_user/features/email/domain/model/email_print.dart';
 import 'package:tmail_ui_user/features/email/domain/model/event_action.dart';
 import 'package:tmail_ui_user/features/email/domain/model/move_to_mailbox_request.dart';
+import 'package:tmail_ui_user/features/email/domain/model/preview_email_eml_request.dart';
 import 'package:tmail_ui_user/features/email/domain/model/restore_deleted_message_request.dart';
 import 'package:tmail_ui_user/features/email/domain/repository/email_repository.dart';
+import 'package:tmail_ui_user/features/email/presentation/model/eml_previewer.dart';
 import 'package:tmail_ui_user/features/mailbox/data/datasource/state_datasource.dart';
 import 'package:tmail_ui_user/features/mailbox/data/model/state_type.dart';
 import 'package:tmail_ui_user/features/mailbox/domain/model/create_new_mailbox_request.dart';
@@ -458,5 +460,40 @@ class EmailRepositoryImpl extends EmailRepository {
       accountId,
       emailId,
       eventActionType);
+  }
+
+  @override
+  Future<List<Email>> parseEmailByBlobIds(AccountId accountId, Set<Id> blobIds) {
+    return emailDataSource[DataSourceType.network]!.parseEmailByBlobIds(accountId, blobIds);
+  }
+
+  @override
+  Future<String> generatePreviewEmailEMLContent(PreviewEmailEMLRequest previewEmailEMLRequest) {
+    return emailDataSource[DataSourceType.network]!.generatePreviewEmailEMLContent(previewEmailEMLRequest);
+  }
+
+  @override
+  Future<void> sharePreviewEmailEMLContent(EMLPreviewer emlPreviewer) {
+    return emailDataSource[DataSourceType.local]!.sharePreviewEmailEMLContent(emlPreviewer);
+  }
+
+  @override
+  Future<EMLPreviewer> getPreviewEmailEMLContentShared(String keyStored) {
+    return emailDataSource[DataSourceType.local]!.getPreviewEmailEMLContentShared(keyStored);
+  }
+
+  @override
+  Future<void> removePreviewEmailEMLContentShared(String keyStored) {
+    return emailDataSource[DataSourceType.local]!.removePreviewEmailEMLContentShared(keyStored);
+  }
+
+  @override
+  Future<void> storePreviewEMLContentToSessionStorage(EMLPreviewer emlPreviewer) {
+    return emailDataSource[DataSourceType.session]!.storePreviewEMLContentToSessionStorage(emlPreviewer);
+  }
+
+  @override
+  Future<EMLPreviewer> getPreviewEMLContentInMemory(String keyStored) {
+    return emailDataSource[DataSourceType.session]!.getPreviewEMLContentInMemory(keyStored);
   }
 }
