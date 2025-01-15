@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2025-01-09T04:35:09.125475",
+  "@@last_modified": "2025-01-15T16:15:35.991650",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4086,6 +4086,18 @@
   },
   "replyToList": "Reply to list",
   "@replyToList": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "printDraft": "Print draft",
+  "@printDraft": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "printDraftFailed": "Print draft failed",
+  "@printDraftFailed": {
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
