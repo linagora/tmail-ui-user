@@ -4294,4 +4294,17 @@ class AppLocalizations {
     );
   }
 
+  String get printDraft {
+    return Intl.message(
+      'Print draft',
+      name: 'printDraft',
+    );
+  }
+
+  String get printDraftFailed{
+    return Intl.message(
+      'Print draft failed',
+      name: 'printDraftFailed',
+    );
+  }
 }

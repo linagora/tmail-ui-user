@@ -1,39 +1,39 @@
 import 'package:core/presentation/resources/image_paths.dart';
 import 'package:core/presentation/views/button/tmail_button_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:tmail_ui_user/features/composer/presentation/styles/web/bottom_bar_composer_widget_style.dart';
+import 'package:tmail_ui_user/features/composer/presentation/widgets/web/mobile_responsive_app_bar_composer_widget.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 
 class BottomBarComposerWidget extends StatelessWidget {
 
+  final ImagePaths imagePaths;
   final bool isCodeViewEnabled;
+  final bool isPrintDraftEnabled;
   final bool isFormattingOptionsEnabled;
   final bool hasReadReceipt;
   final VoidCallback openRichToolbarAction;
   final VoidCallback attachFileAction;
   final VoidCallback insertImageAction;
-  final VoidCallback showCodeViewAction;
   final VoidCallback deleteComposerAction;
   final VoidCallback saveToDraftAction;
   final VoidCallback sendMessageAction;
-  final VoidCallback requestReadReceiptAction;
+  final OnOpenContextMenuAction openContextMenuAction;
 
-  final _imagePaths = Get.find<ImagePaths>();
-
-  BottomBarComposerWidget({
+  const BottomBarComposerWidget({
     super.key,
+    required this.imagePaths,
     required this.isCodeViewEnabled,
+    required this.isPrintDraftEnabled,
     required this.isFormattingOptionsEnabled,
     required this.hasReadReceipt,
     required this.openRichToolbarAction,
     required this.attachFileAction,
     required this.insertImageAction,
-    required this.showCodeViewAction,
     required this.deleteComposerAction,
     required this.saveToDraftAction,
     required this.sendMessageAction,
-    required this.requestReadReceiptAction,
+    required this.openContextMenuAction,
   });
 
   @override
@@ -45,12 +45,10 @@ class BottomBarComposerWidget extends StatelessWidget {
       child: Row(
         children: [
           TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icRichToolbar,
+            icon: imagePaths.icRichToolbar,
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             padding: BottomBarComposerWidgetStyle.richTextIconPadding,
-            backgroundColor: isFormattingOptionsEnabled
-              ? BottomBarComposerWidgetStyle.selectedBackgroundColor
-              : Colors.transparent,
+            backgroundColor: Colors.transparent,
             iconSize: BottomBarComposerWidgetStyle.richTextIconSize,
             iconColor: isFormattingOptionsEnabled
               ? BottomBarComposerWidgetStyle.selectedIconColor
@@ -60,7 +58,7 @@ class BottomBarComposerWidget extends StatelessWidget {
           ),
           const SizedBox(width: BottomBarComposerWidgetStyle.space),
           TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icAttachFile,
+            icon: imagePaths.icAttachFile,
             iconColor: BottomBarComposerWidgetStyle.iconColor,
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             backgroundColor: Colors.transparent,
@@ -73,8 +71,10 @@ class BottomBarComposerWidget extends StatelessWidget {
           AbsorbPointer(
             absorbing: isCodeViewEnabled,
             child: TMailButtonWidget.fromIcon(
-              icon: _imagePaths.icInsertImage,
-              iconColor: BottomBarComposerWidgetStyle.iconColor,
+              icon: imagePaths.icInsertImage,
+              iconColor: isCodeViewEnabled
+                ? BottomBarComposerWidgetStyle.disabledIconColor
+                : BottomBarComposerWidgetStyle.iconColor,
               borderRadius: BottomBarComposerWidgetStyle.iconRadius,
               backgroundColor: Colors.transparent,
               padding: BottomBarComposerWidgetStyle.iconPadding,
@@ -85,55 +85,39 @@ class BottomBarComposerWidget extends StatelessWidget {
           ),
           const SizedBox(width: BottomBarComposerWidgetStyle.space),
           TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icStyleCodeView,
-            iconColor: isCodeViewEnabled
-              ? BottomBarComposerWidgetStyle.selectedIconColor
-              : BottomBarComposerWidgetStyle.iconColor,
-            borderRadius: BottomBarComposerWidgetStyle.iconRadius,
-            backgroundColor: isCodeViewEnabled
-              ? BottomBarComposerWidgetStyle.selectedBackgroundColor
-              : Colors.transparent,
-            padding: BottomBarComposerWidgetStyle.iconPadding,
+            icon: imagePaths.icMore,
+            iconColor: BottomBarComposerWidgetStyle.iconColor,
+            backgroundColor: Colors.transparent,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
-            tooltipMessage: AppLocalizations.of(context).embedCode,
-            onTapActionCallback: showCodeViewAction,
+            tooltipMessage: AppLocalizations.of(context).more,
+            onTapActionAtPositionCallback: openContextMenuAction,
           ),
           const Spacer(),
           TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icDeleteMailbox,
+            icon: imagePaths.icDeleteMailbox,
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             padding: BottomBarComposerWidgetStyle.iconPadding,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
+            iconColor: BottomBarComposerWidgetStyle.iconColor,
+            backgroundColor: Colors.transparent,
             tooltipMessage: AppLocalizations.of(context).delete,
             onTapActionCallback: deleteComposerAction,
           ),
           const SizedBox(width: BottomBarComposerWidgetStyle.space),
           TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icReadReceipt,
+            icon: imagePaths.icSaveToDraft,
             borderRadius: BottomBarComposerWidgetStyle.iconRadius,
             padding: BottomBarComposerWidgetStyle.iconPadding,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
-            iconColor: hasReadReceipt
-              ? BottomBarComposerWidgetStyle.selectedIconColor
-              : BottomBarComposerWidgetStyle.iconColor,
-            tooltipMessage: hasReadReceipt
-              ? AppLocalizations.of(context).turnOffRequestReadReceipt
-              : AppLocalizations.of(context).turnOnRequestReadReceipt,
-            onTapActionCallback: requestReadReceiptAction,
-          ),
-          const SizedBox(width: BottomBarComposerWidgetStyle.space),
-          TMailButtonWidget.fromIcon(
-            icon: _imagePaths.icSaveToDraft,
-            borderRadius: BottomBarComposerWidgetStyle.iconRadius,
-            padding: BottomBarComposerWidgetStyle.iconPadding,
-            iconSize: BottomBarComposerWidgetStyle.iconSize,
+            backgroundColor: Colors.transparent,
+            iconColor: BottomBarComposerWidgetStyle.iconColor,
             tooltipMessage: AppLocalizations.of(context).saveAsDraft,
             onTapActionCallback: saveToDraftAction,
           ),
           const SizedBox(width: BottomBarComposerWidgetStyle.sendButtonSpace),
           TMailButtonWidget(
             text: AppLocalizations.of(context).send,
-            icon: _imagePaths.icSend,
+            icon: imagePaths.icSend,
             iconAlignment: TextDirection.rtl,
             padding: BottomBarComposerWidgetStyle.sendButtonPadding,
             iconSize: BottomBarComposerWidgetStyle.iconSize,
