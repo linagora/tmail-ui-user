@@ -710,7 +710,7 @@ class ComposerController extends BaseController
 
           final accountId = mailboxDashBoardController.accountId.value;
           final downloadUrl = mailboxDashBoardController.sessionCurrent
-            ?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+            ?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
           if (accountId == null || downloadUrl == null) return;
           _getEmailContentFromSessionStorageBrowser(
             htmlContent: arguments.emailContents ?? '',
@@ -1230,7 +1230,7 @@ class ComposerController extends BaseController
     final session = mailboxDashBoardController.sessionCurrent;
     final accountId = mailboxDashBoardController.accountId.value;
     if (session != null && accountId != null) {
-      final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      final uploadUri = session.getUploadUri(accountId, dynamicUrlInterceptors.jmapUrl!);
       uploadController.justUploadAttachmentsAction(
         uploadFiles: pickedFiles,
         uploadUri: uploadUri,
@@ -1855,7 +1855,7 @@ class ComposerController extends BaseController
   void _handleUploadInlineSuccess(SuccessAttachmentUploadState uploadState) {
     uploadController.clearUploadInlineViewState();
 
-    final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+    final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
     final accountId = mailboxDashBoardController.accountId.value;
 
     if (baseDownloadUrl != null && accountId != null) {

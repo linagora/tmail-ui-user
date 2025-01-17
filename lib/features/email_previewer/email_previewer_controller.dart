@@ -275,7 +275,7 @@ class EmailPreviewerController extends ReloadableController {
         email: success.email,
         locale: Localizations.localeOf(currentContext!),
         appLocalizations: AppLocalizations.of(currentContext!),
-        baseDownloadUrl: _session!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl),
+        baseDownloadUrl: _session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!),
         isShared: false,
       ),
     ));
@@ -313,7 +313,7 @@ class EmailPreviewerController extends ReloadableController {
             attachment.downloadTaskId,
             attachment,
             _accountId!,
-            _session!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl),
+            _session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!),
             _downloadAttachmentStreamController!)
         .listen(_handleDownloadAttachmentViewState);
   }

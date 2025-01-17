@@ -14,10 +14,8 @@ import 'package:uri/uri.dart';
 
 extension SessionExtension on Session {
 
-  String getDownloadUrl({String? jmapUrl}) {
-    final downloadUrlValid = jmapUrl != null
-      ? downloadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl))
-      : downloadUrl;
+  String getDownloadUrl(String jmapUrl) {
+    final downloadUrlValid = downloadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl));
     var baseUrl = '${downloadUrlValid.origin}${downloadUrlValid.path}?${downloadUrlValid.query}';
     if (baseUrl.endsWith('/')) {
       baseUrl = baseUrl.substring(0, baseUrl.length - 1);
@@ -26,10 +24,8 @@ extension SessionExtension on Session {
     return downloadUrlDecode;
   }
 
-  Uri getUploadUri(AccountId accountId, {String? jmapUrl}) {
-    final uploadUrlValid = jmapUrl != null
-      ? uploadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl))
-      : uploadUrl;
+  Uri getUploadUri(AccountId accountId, String jmapUrl) {
+    final uploadUrlValid = uploadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl));
     final baseUrl = '${uploadUrlValid.origin}${uploadUrlValid.path}';
     final uploadUriTemplate = UriTemplate(Uri.decodeFull(baseUrl));
     final uploadUri = uploadUriTemplate.expand({
