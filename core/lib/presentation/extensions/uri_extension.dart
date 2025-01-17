@@ -12,7 +12,12 @@ extension URIExtension on Uri {
     } else {
       if (!hasOrigin) {
         final baseUrlValid = baseUrl.toString().removeLastSlashOfUrl();
-        final sourceUrlValid = toString().addFirstSlashOfUrl().removeLastSlashOfUrl();
+        final sourceUrlValid;
+        if (toString().hasTrailingSlash()) {
+          sourceUrlValid = toString().addFirstSlashOfUrl();
+        } else {
+          sourceUrlValid = toString().addFirstSlashOfUrl().removeLastSlashOfUrl();
+        }
         log('SessionUtils::toQualifiedUrl():baseUrlValid: $baseUrlValid | sourceUrlValid: $sourceUrlValid');
         final qualifiedUrl = baseUrlValid + sourceUrlValid;
         log('SessionUtils::toQualifiedUrl():qualifiedUrl: $qualifiedUrl');
@@ -27,7 +32,7 @@ extension URIExtension on Uri {
 
   bool get hasOrigin {
     try {
-      return origin.isNotEmpty;
+      return !hasScheme ? false : origin.isNotEmpty;
     } catch (e) {
       logError('URIExtension::hasOrigin:Exception = $e');
       return false;
