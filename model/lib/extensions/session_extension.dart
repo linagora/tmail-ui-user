@@ -2,14 +2,18 @@
 import 'dart:ui';
 
 import 'package:core/presentation/extensions/uri_extension.dart';
+import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/capability/calendar_event_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_properties.dart';
+import 'package:jmap_dart_client/jmap/core/capability/default_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/empty_capability.dart';
+import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:model/error_type_handler/account_exception.dart';
 import 'package:model/model.dart';
+import 'package:model/principals/capability_principals.dart';
 import 'package:uri/uri.dart';
 
 extension SessionExtension on Session {
@@ -45,6 +49,30 @@ extension SessionExtension on Session {
     if (capability is T) {
       return capability;
     } else {
+      return null;
+    }
+  }
+
+  String? getEmailAddress() {
+    if(username.value.isEmail) {
+      return username.value;
+    } else {
+      return getEmailAddressFromPrincipalsCapability();
+    }
+  }
+
+  String? getEmailAddressFromPrincipalsCapability() {
+    try {
+      var principalsCapability = getCapabilityProperties<DefaultCapability>(AccountId(Id(username.value)), capabilityPrincipals);
+    
+      String wrappedAddress = ((((principalsCapability?.properties
+          ?.values.last) as Map<String, dynamic>)
+          .values.last) as Map<String, dynamic>)
+          .values.toString();
+    
+      String address = wrappedAddress.substring("(mailto:".length, wrappedAddress.length - ")".length);
+      return address.isEmail ? address : null;
+    } catch (_) {
       return null;
     }
   }

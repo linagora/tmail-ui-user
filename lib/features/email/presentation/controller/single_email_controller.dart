@@ -1341,7 +1341,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       return;
     }
 
-    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session!.username.value;
+    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session!.getEmailAddress() ?? '';
     log('SingleEmailController::_handleSendReceiptToSenderAction():receiverEmailAddress: $receiverEmailAddress');
     final mdnToSender = _generateMDN(context, currentEmail!, receiverEmailAddress);
     final sendReceiptRequest = SendReceiptToSenderRequest(
@@ -2190,8 +2190,8 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
 
     listEmailAddressAttendees.addAll(listEmailAddress);
 
-    final username = mailboxDashBoardController.sessionCurrent?.username.value ?? '';
-    final listEmailAddressMailTo = listEmailAddressAttendees.removeInvalidEmails(username);
+    final currentUserEmail = mailboxDashBoardController.sessionCurrent?.getEmailAddress() ?? '';
+    final listEmailAddressMailTo = listEmailAddressAttendees.removeInvalidEmails(currentUserEmail);
     log('SingleEmailController::handleMailToAttendees: listEmailAddressMailTo = $listEmailAddressMailTo');
     mailboxDashBoardController.goToComposer(
       ComposerArguments.fromMailtoUri(listEmailAddress: listEmailAddressMailTo)
