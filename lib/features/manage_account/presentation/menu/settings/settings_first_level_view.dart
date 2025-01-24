@@ -139,7 +139,7 @@ class SettingsFirstLevelView extends GetWidget<SettingsController> {
           AccountMenuItem.languageAndRegion.getIcon(controller.imagePaths),
           () => controller.selectSettings(AccountMenuItem.languageAndRegion)
         ),
-        if (PlatformInfo.isMobile) ...[
+        if (PlatformInfo.isMobile && controller.manageAccountDashboardController.isFcmCapabilitySupported) ...[
           Divider(
             color: AppColor.colorDividerHorizontal,
             height: 1,
