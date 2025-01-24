@@ -2838,7 +2838,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
     isRecoveringDeletedMessage.value = true;
   }
 
-  String get userEmail => sessionCurrent?.username.value ?? '';
+  String get userEmail => sessionCurrent?.getEmailAddress() ?? '';
 
   Future<void> _removeComposerCacheOnWeb() async {
     await _removeComposerCacheOnWebInteractor.execute();
@@ -2875,7 +2875,7 @@ class MailboxDashBoardController extends ReloadableController with UserSettingPo
       position,
       popupMenuUserSettingActionTile(
         context,
-        sessionCurrent?.username,
+        sessionCurrent?.getEmailAddress(),
         onLogoutAction: () {
           popBack();
           logout(

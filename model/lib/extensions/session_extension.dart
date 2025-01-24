@@ -2,11 +2,14 @@
 import 'dart:ui';
 
 import 'package:core/presentation/extensions/uri_extension.dart';
+import 'package:get/get.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/capability/calendar_event_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_properties.dart';
+import 'package:jmap_dart_client/jmap/core/capability/default_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/empty_capability.dart';
+import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:model/error_type_handler/account_exception.dart';
 import 'package:model/model.dart';
@@ -46,6 +49,28 @@ extension SessionExtension on Session {
       return capability;
     } else {
       return null;
+    }
+  }
+
+  String? getEmailAddress() {
+    if(username.value.isEmail) {
+      return username.value;
+    } else {
+      try {
+        var principalsCapability = getCapabilityProperties<DefaultCapability>(
+            AccountId(Id(username.value)),
+            CapabilityIdentifier(Uri.parse('urn:ietf:params:jmap:principals')));
+
+        String wrappedAddress = ((((principalsCapability?.properties
+            ?.values.last) as Map<String, dynamic>)
+            .values.last) as Map<String, dynamic>)
+            .values.toString();
+
+        String address = wrappedAddress.substring("(mailto:".length, wrappedAddress.length - ")".length);
+        return address.isEmail ? address : null;
+      } catch (_) {
+        return null;
+      }
     }
   }
 
