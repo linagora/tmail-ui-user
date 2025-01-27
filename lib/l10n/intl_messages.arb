@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2025-01-16T15:36:00.389145",
+  "@@last_modified": "2025-01-27T11:18:56.643895",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -122,6 +122,16 @@
   },
   "unexpectedError": "Unexpected error: {errorMessage}",
   "@unexpectedError": {
+    "type": "text",
+    "placeholders_order": [
+      "errorMessage"
+    ],
+    "placeholders": {
+      "errorMessage": {}
+    }
+  },
+  "handshakeException": "Handshake error in client: {errorMessage}",
+  "@handshakeException": {
     "type": "text",
     "placeholders_order": [
       "errorMessage"

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:core/presentation/state/failure.dart';
 import 'package:core/presentation/utils/app_toast.dart';
 import 'package:core/utils/app_logger.dart';
@@ -45,6 +47,8 @@ class ToastManager {
       return AppLocalizations.of(context).notFoundSession;
     } else if (exception is NoNetworkError) {
       return AppLocalizations.of(context).youAreOffline;
+    } else if (exception is HandshakeException) {
+      return AppLocalizations.of(context).handshakeException(exception.osError?.message ?? '');
     } else {
       try {
         return AppLocalizations.of(context).unexpectedError(exception.message);
