@@ -2,11 +2,14 @@
 import 'dart:ui';
 
 import 'package:core/presentation/extensions/uri_extension.dart';
+import 'package:get/get.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/capability/calendar_event_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_properties.dart';
+import 'package:jmap_dart_client/jmap/core/capability/default_capability.dart';
 import 'package:jmap_dart_client/jmap/core/capability/empty_capability.dart';
+import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:model/error_type_handler/account_exception.dart';
 import 'package:model/model.dart';
@@ -14,10 +17,8 @@ import 'package:uri/uri.dart';
 
 extension SessionExtension on Session {
 
-  String getDownloadUrl({String? jmapUrl}) {
-    final downloadUrlValid = jmapUrl != null
-      ? downloadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl))
-      : downloadUrl;
+  String getDownloadUrl(String jmapUrl) {
+    final downloadUrlValid = downloadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl));
     var baseUrl = '${downloadUrlValid.origin}${downloadUrlValid.path}?${downloadUrlValid.query}';
     if (baseUrl.endsWith('/')) {
       baseUrl = baseUrl.substring(0, baseUrl.length - 1);
@@ -26,10 +27,8 @@ extension SessionExtension on Session {
     return downloadUrlDecode;
   }
 
-  Uri getUploadUri(AccountId accountId, {String? jmapUrl}) {
-    final uploadUrlValid = jmapUrl != null
-      ? uploadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl))
-      : uploadUrl;
+  Uri getUploadUri(AccountId accountId, String jmapUrl) {
+    final uploadUrlValid = uploadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl));
     final baseUrl = '${uploadUrlValid.origin}${uploadUrlValid.path}';
     final uploadUriTemplate = UriTemplate(Uri.decodeFull(baseUrl));
     final uploadUri = uploadUriTemplate.expand({
@@ -50,6 +49,28 @@ extension SessionExtension on Session {
       return capability;
     } else {
       return null;
+    }
+  }
+
+  String? getEmailAddress() {
+    if(username.value.isEmail) {
+      return username.value;
+    } else {
+      try {
+        var principalsCapability = getCapabilityProperties<DefaultCapability>(
+            AccountId(Id(username.value)),
+            CapabilityIdentifier(Uri.parse('urn:ietf:params:jmap:principals')));
+
+        String wrappedAddress = ((((principalsCapability?.properties
+            ?.values.last) as Map<String, dynamic>)
+            .values.last) as Map<String, dynamic>)
+            .values.toString();
+
+        String address = wrappedAddress.substring("(mailto:".length, wrappedAddress.length - ")".length);
+        return address.isEmail ? address : null;
+      } catch (_) {
+        return null;
+      }
     }
   }
 

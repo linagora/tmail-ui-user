@@ -206,7 +206,7 @@ class PublicAssetController extends BaseController {
     if (session == null || accountId == null) return;
 
     final fileInfo = platformFile.toFileInfo();
-    final uploadUri = session!.getUploadUri(accountId!, jmapUrl: dynamicUrlInterceptors.jmapUrl);
+    final uploadUri = session!.getUploadUri(accountId!, dynamicUrlInterceptors.jmapUrl!);
     consumeState(_uploadAttachmentInteractor.execute(fileInfo, uploadUri));
   }
 

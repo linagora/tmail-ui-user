@@ -46,4 +46,9 @@ extension URLExtension on String {
       return '/$this';
     }
   }
+
+  bool hasTrailingSlash() {
+    final lastSlash = lastIndexOf('/');
+    return lastSlash == length - 1;
+  }
 }

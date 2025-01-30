@@ -353,9 +353,14 @@ class IdentityCreatorController extends BaseController with DragDropFileMixin im
   void _getAllIdentitiesSuccess(GetAllIdentitiesSuccess success) {
     if (success.identities?.isNotEmpty == true) {
       listEmailAddressDefault.value = success.identities!
+          .where((identity) => (identity.email != null))
           .map((identity) => identity.toEmailAddressNoName())
           .toSet()
           .toList();
+
+      if(session?.getEmailAddress() != null) {
+        listEmailAddressDefault.add(EmailAddress(null, session?.getEmailAddress()));
+      }
       listEmailAddressOfReplyTo.add(noneEmailAddress);
       listEmailAddressOfReplyTo.addAll(listEmailAddressDefault);
       _setUpAllFieldEmailAddress();
@@ -375,8 +380,8 @@ class IdentityCreatorController extends BaseController with DragDropFileMixin im
   void _setDefaultEmailAddressList() {
     listEmailAddressOfReplyTo.add(noneEmailAddress);
 
-    if (session?.username.value.isNotEmpty == true) {
-      final userEmailAddress = EmailAddress(null, session?.username.value);
+    if (session?.getEmailAddress() != null) {
+      final userEmailAddress = EmailAddress(null, session?.getEmailAddress());
       listEmailAddressDefault.add(userEmailAddress);
       listEmailAddressOfReplyTo.addAll(listEmailAddressDefault);
     }

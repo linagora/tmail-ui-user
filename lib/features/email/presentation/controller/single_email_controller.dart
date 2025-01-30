@@ -479,7 +479,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       final session = mailboxDashBoardController.sessionCurrent;
       final accountId = mailboxDashBoardController.accountId.value;
       if (session != null && accountId != null) {
-        final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl) ?? '';
+        final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!) ?? '';
         TransformConfiguration transformConfiguration = PlatformInfo.isWeb
           ? TransformConfiguration.forPreviewEmailOnWeb()
           : TransformConfiguration.forPreviewEmail();
@@ -715,7 +715,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   void _downloadAttachmentsAction(List<Attachment> attachments) async {
     final accountId = mailboxDashBoardController.accountId.value;
     if (accountId != null && mailboxDashBoardController.sessionCurrent != null) {
-      final baseDownloadUrl = mailboxDashBoardController.sessionCurrent!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      final baseDownloadUrl = mailboxDashBoardController.sessionCurrent!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
       consumeState(_downloadAttachmentsInteractor.execute(attachments, accountId, baseDownloadUrl));
     }
   }
@@ -764,7 +764,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   void _exportAttachmentAction(Attachment attachment, CancelToken cancelToken) async {
     final accountId = mailboxDashBoardController.accountId.value;
     if (accountId != null && mailboxDashBoardController.sessionCurrent != null) {
-      final baseDownloadUrl = mailboxDashBoardController.sessionCurrent!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      final baseDownloadUrl = mailboxDashBoardController.sessionCurrent!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
       consumeState(_exportAttachmentInteractor.execute(attachment, accountId, baseDownloadUrl, cancelToken));
     }
   }
@@ -811,7 +811,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
     final accountId = mailboxDashBoardController.accountId.value;
     final session = mailboxDashBoardController.sessionCurrent;
     if (accountId != null && session != null) {
-      final baseDownloadUrl = session.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      final baseDownloadUrl = session.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
       final generateTaskId = DownloadTaskId(uuid.v4());
       consumeState(_downloadAttachmentForWebInteractor.execute(
           generateTaskId,
@@ -1238,7 +1238,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       return;
     }
 
-    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session.username.value;
+    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session.getEmailAddress() ?? '';
     log('SingleEmailController::_handleSendReceiptToSenderAction():receiverEmailAddress: $receiverEmailAddress');
     final mdnToSender = _generateMDN(context, currentEmail!, receiverEmailAddress);
     final sendReceiptRequest = SendReceiptToSenderRequest(
@@ -1829,7 +1829,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   Future<void> previewPDFFileAction(BuildContext context, Attachment attachment) async {
     final accountId = mailboxDashBoardController.accountId.value;
     final downloadUrl = mailboxDashBoardController.sessionCurrent
-      ?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      ?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
 
     if (accountId == null || downloadUrl == null) {
       appToast.showToastErrorMessage(
@@ -1867,8 +1867,8 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
 
     listEmailAddressAttendees.addAll(listEmailAddress);
 
-    final username = mailboxDashBoardController.sessionCurrent?.username.value ?? '';
-    final listEmailAddressMailTo = listEmailAddressAttendees.removeInvalidEmails(username);
+    final currentUserEmail = mailboxDashBoardController.sessionCurrent?.getEmailAddress() ?? '';
+    final listEmailAddressMailTo = listEmailAddressAttendees.removeInvalidEmails(currentUserEmail);
     log('SingleEmailController::handleMailToAttendees: listEmailAddressMailTo = $listEmailAddressMailTo');
     mailboxDashBoardController.goToComposer(
       ComposerArguments.fromMailtoUri(listEmailAddress: listEmailAddressMailTo)

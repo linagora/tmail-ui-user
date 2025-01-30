@@ -285,4 +285,12 @@ mixin EmailActionController {
   void archiveMessage(BuildContext context, PresentationEmail email) {
     mailboxDashBoardController.archiveMessage(context, email);
   }
+
+  void moveMessageToTrash(BuildContext context, PresentationEmail email) {
+    mailboxDashBoardController.moveMessageToTrash(context, email);
+  }
+
+  bool hasArchiveMailbox() {
+    return mailboxDashBoardController.hasArchiveMailbox();
+  }
 }

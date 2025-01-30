@@ -55,8 +55,8 @@ extension SessionExtensions on Session {
 
   String get internalDomain {
     try {
-      if (GetUtils.isEmail(username.value)) {
-        return username.value.split('@').last;
+      if (getEmailAddress() != null) {
+        return getEmailAddress()!.split('@').last;
       } else if (GetUtils.isEmail(personalAccount.name.value)) {
         return personalAccount.name.value.split('@').last;
       } else {

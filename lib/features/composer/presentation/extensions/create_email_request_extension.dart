@@ -9,8 +9,8 @@ import 'package:jmap_dart_client/jmap/mail/email/keyword_identifier.dart';
 import 'package:jmap_dart_client/jmap/mail/mailbox/mailbox.dart';
 import 'package:model/email/email_action_type.dart';
 import 'package:model/extensions/email_address_extension.dart';
-import 'package:model/extensions/username_extension.dart';
 import 'package:model/mailbox/presentation_mailbox.dart';
+import 'package:model/model.dart';
 import 'package:tmail_ui_user/features/composer/domain/model/email_request.dart';
 import 'package:tmail_ui_user/features/composer/presentation/extensions/identity_extension.dart';
 import 'package:tmail_ui_user/features/composer/presentation/model/create_email_request.dart';
@@ -25,8 +25,10 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
   Set<EmailAddress> createSenders() {
     if (identity?.email?.isNotEmpty == true) {
       return { identity!.toEmailAddress() };
+    } else if (session.getEmailAddress() != null) {
+      return { EmailAddress(null, session.getEmailAddress()) };
     } else {
-      return { session.username.toEmailAddress() };
+      throw Exception("CreateEmailRequestExtension::createSenders() : unknown email address for current user");
     }
   }
 
@@ -34,7 +36,7 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
     if (emailActionType == EmailActionType.editDraft && fromSender.isNotEmpty) {
       return fromSender.first.emailAddress;
     } else {
-      return session.username.value;
+      return session.getEmailAddress() ?? '';
     }
   }
 
@@ -44,7 +46,7 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
     } else if (identity?.replyTo?.isNotEmpty == true) {
       return identity!.replyTo!.toSet();
     } else {
-      return { session.username.toEmailAddress() };
+      return session.getEmailAddress() == null ? {} : { EmailAddress(null, session.getEmailAddress()) };
     }
   }
 

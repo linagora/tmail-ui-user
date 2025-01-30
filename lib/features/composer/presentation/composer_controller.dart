@@ -707,7 +707,7 @@ class ComposerController extends BaseController
 
           final accountId = mailboxDashBoardController.accountId.value;
           final downloadUrl = mailboxDashBoardController.sessionCurrent
-            ?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+            ?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
           if (accountId == null || downloadUrl == null) return;
           _getEmailContentFromSessionStorageBrowser(
             htmlContent: arguments.emailContents ?? '',
@@ -825,18 +825,18 @@ class ComposerController extends BaseController
       emailActionType: actionType,
       mailboxRole: mailboxRole
     );
-    final userName =  mailboxDashBoardController.sessionCurrent?.username;
-    if (userName != null) {
-      final isSender = presentationEmail.from.asList().every((element) => element.email == userName.value);
+    final senderEmailAddress =  mailboxDashBoardController.sessionCurrent?.getEmailAddress();
+    if (senderEmailAddress != null) {
+      final isSender = presentationEmail.from.asList().every((element) => element.email == senderEmailAddress);
       if (isSender) {
         listToEmailAddress = List.from(recipients.value1.toSet());
         listCcEmailAddress = List.from(recipients.value2.toSet());
         listBccEmailAddress = List.from(recipients.value3.toSet());
         listReplyToEmailAddress = List.from(recipients.value4.toSet());
       } else {
-        listToEmailAddress = List.from(recipients.value1.toSet().filterEmailAddress(userName.value));
-        listCcEmailAddress = List.from(recipients.value2.toSet().filterEmailAddress(userName.value));
-        listBccEmailAddress = List.from(recipients.value3.toSet().filterEmailAddress(userName.value));
+        listToEmailAddress = List.from(recipients.value1.toSet().filterEmailAddress(senderEmailAddress));
+        listCcEmailAddress = List.from(recipients.value2.toSet().filterEmailAddress(senderEmailAddress));
+        listBccEmailAddress = List.from(recipients.value3.toSet().filterEmailAddress(senderEmailAddress));
         listReplyToEmailAddress = List.from(recipients.value4.toSet());
       }
     } else {
@@ -1247,7 +1247,7 @@ class ComposerController extends BaseController
     final session = mailboxDashBoardController.sessionCurrent;
     final accountId = mailboxDashBoardController.accountId.value;
     if (session != null && accountId != null) {
-      final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
+      final uploadUri = session.getUploadUri(accountId, dynamicUrlInterceptors.jmapUrl!);
       uploadController.justUploadAttachmentsAction(
         uploadFiles: pickedFiles,
         uploadUri: uploadUri,
@@ -1502,7 +1502,7 @@ class ComposerController extends BaseController
       if (arguments.emailActionType == EmailActionType.editDraft) {
         return arguments.presentationEmail?.firstEmailAddressInFrom ?? '';
       } else {
-        return mailboxDashBoardController.sessionCurrent?.username.value ?? '';
+        return mailboxDashBoardController.sessionCurrent?.getEmailAddress() ?? '';
       }
     }
     return '';
@@ -1874,7 +1874,7 @@ class ComposerController extends BaseController
   void _handleUploadInlineSuccess(SuccessAttachmentUploadState uploadState) {
     uploadController.clearUploadInlineViewState();
 
-    final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
+    final baseDownloadUrl = mailboxDashBoardController.sessionCurrent?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
     final accountId = mailboxDashBoardController.accountId.value;
 
     if (baseDownloadUrl != null && accountId != null) {
