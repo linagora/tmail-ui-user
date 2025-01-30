@@ -20,7 +20,7 @@ void main() {
       final baseUrl = Uri.parse('https://domain.com');
       final sourceUrl = Uri.parse('/jmap/');
 
-      final qualifiedUrlExpected = Uri.parse('https://domain.com/jmap');
+      final qualifiedUrlExpected = Uri.parse('https://domain.com/jmap/');
       final qualifiedUrlResult = sourceUrl.toQualifiedUrl(baseUrl: baseUrl);
 
       expect(qualifiedUrlResult, equals(qualifiedUrlExpected));
@@ -50,7 +50,7 @@ void main() {
       final baseUrl = Uri.parse('https://domain.com/jmap');
       final sourceUrl = Uri.parse('/');
 
-      final qualifiedUrlExpected = Uri.parse('https://domain.com/jmap');
+      final qualifiedUrlExpected = Uri.parse('https://domain.com/jmap/');
       final qualifiedUrlResult = sourceUrl.toQualifiedUrl(baseUrl: baseUrl);
 
       expect(qualifiedUrlResult, equals(qualifiedUrlExpected));
@@ -70,7 +70,7 @@ void main() {
       final baseUrl = Uri.parse('https://domain.com:2000/jmap');
       final sourceUrl = Uri.parse('https://domain.com:2001/jmap/');
 
-      final qualifiedUrlExpected = Uri.parse('https://domain.com:2001/jmap');
+      final qualifiedUrlExpected = Uri.parse('https://domain.com:2001/jmap/');
       final qualifiedUrlResult = sourceUrl.toQualifiedUrl(baseUrl: baseUrl);
 
       expect(qualifiedUrlResult, equals(qualifiedUrlExpected));
