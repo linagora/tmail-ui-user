@@ -38,6 +38,9 @@ class OIDCHttpClient {
       } else {
         return OIDCResponse.fromJson(jsonDecode(result));
       }
+    } on FormatException catch (exception) {
+      log('checkOIDCIsAvailable(): error while parsing server response (JSON expected): ${exception.message}');
+      rethrow;
     } on DioError catch (exception) {
       if (exception.response?.statusCode == 404) {
         throw CanNotFoundOIDCLinks();
