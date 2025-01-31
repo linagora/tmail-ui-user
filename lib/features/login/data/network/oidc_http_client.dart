@@ -1,9 +1,11 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:core/data/model/query/query_parameter.dart';
 import 'package:core/data/network/dio_client.dart';
 import 'package:core/utils/app_logger.dart';
+import 'package:get/get_connect/http/src/exceptions/exceptions.dart';
 import 'package:model/oidc/oidc_configuration.dart';
 import 'package:model/oidc/request/oidc_request.dart';
 import 'package:model/oidc/response/oidc_discovery_response.dart';
@@ -39,6 +41,12 @@ class OIDCHttpClient {
         return OIDCResponse.fromJson(jsonDecode(result));
       }
     } on DioError catch (exception) {
+      if (exception.error is HandshakeException) {
+        throw exception.error!;
+      }
+      if (exception.response?.statusCode == 401) {
+        throw UnauthorizedException();
+      }
       if (exception.response?.statusCode == 404) {
         throw CanNotFoundOIDCLinks();
       }

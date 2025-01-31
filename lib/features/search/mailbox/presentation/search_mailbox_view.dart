@@ -15,6 +15,7 @@ import 'package:tmail_ui_user/features/mailbox/domain/state/search_mailbox_state
 import 'package:tmail_ui_user/features/mailbox/presentation/mixin/mailbox_widget_mixin.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/model/context_item_mailbox_action.dart';
 import 'package:tmail_ui_user/features/mailbox/presentation/model/mailbox_actions.dart';
+import 'package:tmail_ui_user/features/mailbox/presentation/utils/mailbox_utils.dart';
 import 'package:tmail_ui_user/features/search/mailbox/presentation/search_mailbox_controller.dart';
 import 'package:tmail_ui_user/features/search/mailbox/presentation/utils/search_mailbox_utils.dart';
 import 'package:tmail_ui_user/features/search/mailbox/presentation/widgets/mailbox_searched_item_builder.dart';
@@ -196,14 +197,19 @@ class SearchMailboxView extends GetWidget<SearchMailboxController>
   }
 
   List<FocusedMenuItem> _listPopupMenuItemAction(BuildContext context, PresentationMailbox mailbox) {
-    final bool subaddressingSupported = MailboxWidgetMixin.isSubaddressingSupported(
+    final bool subaddressingSupported = MailboxUtils.isSubaddressingSupported(
+        controller.dashboardController.sessionCurrent,
+        controller.dashboardController.accountId.value);
+
+    final bool deletedMessageVaultSupported = MailboxUtils.isDeletedMessageVaultSupported(
         controller.dashboardController.sessionCurrent,
         controller.dashboardController.accountId.value);
 
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.dashboardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
     return contextMenuActions
       .map((action) => _mailboxFocusedMenuItem(context, action, mailbox))
@@ -257,14 +263,19 @@ class SearchMailboxView extends GetWidget<SearchMailboxController>
     PresentationMailbox mailbox,
     {RelativeRect? position}
   ) {
-    final bool subaddressingSupported = MailboxWidgetMixin.isSubaddressingSupported(
+    final bool subaddressingSupported = MailboxUtils.isSubaddressingSupported(
+        controller.dashboardController.sessionCurrent,
+        controller.dashboardController.accountId.value);
+
+    final bool deletedMessageVaultSupported = MailboxUtils.isDeletedMessageVaultSupported(
         controller.dashboardController.sessionCurrent,
         controller.dashboardController.accountId.value);
 
     final contextMenuActions = listContextMenuItemAction(
       mailbox,
       controller.dashboardController.enableSpamReport,
-      subaddressingSupported
+      subaddressingSupported,
+      deletedMessageVaultSupported
     );
 
     if (contextMenuActions.isEmpty) {
