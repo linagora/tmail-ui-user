@@ -554,61 +554,34 @@ class ThreadView extends GetWidget<ThreadController>
           ],
         ),
       ),
-      secondaryBackground: controller.isInArchiveMailbox(presentationEmail) || (controller.isInTrashMailbox(presentationEmail) && !controller.hasArchiveMailbox())
-        ? null
-        : controller.hasArchiveMailbox()
-          ? Container(
-              color: AppColor.colorItemRecipientSelected,
-              padding: const EdgeInsetsDirectional.only(end: 16),
-              alignment: AlignmentDirectional.centerEnd,
-              child: Row(
-                children: [
-                  const Spacer(),
-                  CircleAvatar(
-                      backgroundColor: AppColor.colorSpamReportBannerBackground,
-                      radius: 24,
-                      child: SvgPicture.asset(
-                        controller.imagePaths.icMailboxArchived,
-                        fit: BoxFit.fill,
-                      )
+      secondaryBackground: controller.isInArchiveMailbox(presentationEmail) == false
+        ? Container(
+            color: AppColor.colorItemRecipientSelected,
+            padding: const EdgeInsetsDirectional.only(end: 16),
+            alignment: AlignmentDirectional.centerEnd,
+            child: Row(
+              children: [
+                const Spacer(),
+                CircleAvatar(
+                  backgroundColor: AppColor.colorSpamReportBannerBackground,
+                  radius: 24,
+                  child: SvgPicture.asset(
+                    controller.imagePaths.icMailboxArchived,
+                    fit: BoxFit.fill,
+                  )
+                ),
+                const SizedBox(width: 11),
+                Text(
+                  AppLocalizations.of(context).archiveMessage,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: AppColor.primaryColor,
                   ),
-                  const SizedBox(width: 11),
-                  Text(
-                    AppLocalizations.of(context).archiveMessage,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: AppColor.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : Container(
-              color: AppColor.colorActionDeleteConfirmDialog,
-              padding: const EdgeInsetsDirectional.only(end: 16),
-              alignment: AlignmentDirectional.centerEnd,
-              child: Row(
-                children: [
-                  const Spacer(),
-                  CircleAvatar(
-                      backgroundColor: AppColor.primaryLightColor,
-                      radius: 24,
-                      child: SvgPicture.asset(
-                        controller.imagePaths.icDeleteMailbox,
-                        fit: BoxFit.fill,
-                      )
-                  ),
-                  const SizedBox(width: 11),
-                  Text(
-                    AppLocalizations.of(context).move_to_trash,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: AppColor.primaryLightColor,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+          )
+        : null,
       confirmDismiss: (direction) => controller.swipeEmailAction(context, presentationEmail, direction),
       child: EmailTileBuilder(
         key: Key('email_tile_builder_${presentationEmail.id?.asString}'),

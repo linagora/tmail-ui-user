@@ -338,11 +338,7 @@ mixin EmailActionController {
     mailboxDashBoardController.archiveMessage(context, email);
   }
 
-  void moveMessageToTrash(BuildContext context, PresentationEmail email) {
-    mailboxDashBoardController.moveMessageToTrash(context, email);
-  }
-
   bool hasArchiveMailbox() {
-    return mailboxDashBoardController.hasArchiveMailbox();
+    return mailboxDashBoardController.getMailboxIdByRole(PresentationMailbox.roleArchive) != null;
   }
 }

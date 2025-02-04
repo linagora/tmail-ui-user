@@ -1406,7 +1406,7 @@ class ThreadController extends BaseController with EmailActionController {
       ReadActions readActions = !email.hasRead ? ReadActions.markAsRead : ReadActions.markAsUnread;
       markAsEmailRead(email, readActions, MarkReadAction.swipeOnThread);
     } else if (direction == DismissDirection.endToStart) {
-      hasArchiveMailbox() ? archiveMessage(context, email) : moveMessageToTrash(context, email);
+      archiveMessage(context, email);
     }
     return false;
   }
@@ -1420,13 +1420,12 @@ class ThreadController extends BaseController with EmailActionController {
       return DismissDirection.none;
     }
 
-    return isInArchiveMailbox(email) || (isInTrashMailbox(email) && !hasArchiveMailbox())
+    return isInArchiveMailbox(email) || !hasArchiveMailbox()
       ? DismissDirection.startToEnd
       : DismissDirection.horizontal;
   }
 
   bool isInArchiveMailbox(PresentationEmail email) => email.mailboxContain?.isArchive == true;
-  bool isInTrashMailbox(PresentationEmail email) => email.mailboxContain?.isTrash == true;
 
   void scrollToTop() {
     if (listEmailController.hasClients) {
