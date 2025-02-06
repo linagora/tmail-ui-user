@@ -5,7 +5,6 @@ import 'package:contact/contact/model/autocomplete_capability.dart';
 import 'package:contact/contact/model/capability_contact.dart';
 import 'package:core/presentation/extensions/uri_extension.dart';
 import 'package:core/utils/app_logger.dart';
-import 'package:get/get.dart';
 import 'package:jmap_dart_client/http/converter/state_converter.dart';
 import 'package:jmap_dart_client/http/converter/user_name_converter.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
