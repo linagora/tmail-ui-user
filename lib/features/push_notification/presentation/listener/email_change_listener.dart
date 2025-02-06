@@ -334,7 +334,7 @@ class EmailChangeListener extends ChangeListener {
     if (_getListDetailedEmailByIdInteractor != null &&
         _dynamicUrlInterceptors != null &&
         session != null) {
-      final baseDownloadUrl = session.getDownloadUrl(_dynamicUrlInterceptors!.jmapUrl!);
+      final baseDownloadUrl = session.getDownloadUrl(jmapUrl: _dynamicUrlInterceptors!.jmapUrl);
       consumeState(_getListDetailedEmailByIdInteractor!.execute(
         session,
         accountId,

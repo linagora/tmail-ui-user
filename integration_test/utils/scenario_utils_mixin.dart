@@ -144,7 +144,7 @@ mixin ScenarioUtilsMixin {
       );
       final uploadUri = mailboxDashBoardController.sessionCurrent!.getUploadUri(
         mailboxDashBoardController.accountId.value!,
-        mailboxDashBoardController.dynamicUrlInterceptors.jmapUrl!,
+        jmapUrl: mailboxDashBoardController.dynamicUrlInterceptors.jmapUrl,
       );
       
       final uploadAttachmentInteractor = Get.find<UploadAttachmentInteractor>();

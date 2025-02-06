@@ -530,7 +530,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       )));
     } else {
       if (session != null && accountId != null) {
-        final baseDownloadUrl = session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+        final baseDownloadUrl = session!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
         TransformConfiguration transformConfiguration = PlatformInfo.isWeb
           ? TransformConfiguration.forPreviewEmailOnWeb()
           : TransformConfiguration.forPreviewEmail();
@@ -767,7 +767,9 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
 
   void _downloadAttachmentsAction(List<Attachment> attachments) {
     if (accountId != null && session != null) {
-      final baseDownloadUrl = session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+      final baseDownloadUrl = session!.getDownloadUrl(
+        jmapUrl: dynamicUrlInterceptors.jmapUrl,
+      );
       consumeState(_downloadAttachmentsInteractor.execute(
         attachments,
         accountId!,
@@ -819,7 +821,9 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
 
   void _exportAttachmentAction(Attachment attachment, CancelToken cancelToken) {
     if (accountId != null && session != null) {
-      final baseDownloadUrl = session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+      final baseDownloadUrl = session!.getDownloadUrl(
+        jmapUrl: dynamicUrlInterceptors.jmapUrl,
+      );
       consumeState(_exportAttachmentInteractor.execute(
         attachment,
         accountId!,
@@ -869,7 +873,9 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
 
   void downloadAttachmentForWeb(Attachment attachment) {
     if (accountId != null && session != null) {
-      final baseDownloadUrl = session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+      final baseDownloadUrl = session!.getDownloadUrl(
+        jmapUrl: dynamicUrlInterceptors.jmapUrl,
+      );
       final generateTaskId = DownloadTaskId(uuid.v4());
       consumeState(_downloadAttachmentForWebInteractor.execute(
           generateTaskId,
@@ -1997,7 +2003,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
   ) {
     final accountId = mailboxDashBoardController.accountId.value;
     final downloadUrl = mailboxDashBoardController.sessionCurrent
-        ?.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+        ?.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl);
     final blobId = attachment.blobId;
 
     if (accountId == null || downloadUrl == null || blobId == null) {
@@ -2024,7 +2030,9 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
         AppLocalizations.of(context).noPreviewAvailable);
       return;
     }
-    final downloadUrl = session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!);
+    final downloadUrl = session!.getDownloadUrl(
+      jmapUrl: dynamicUrlInterceptors.jmapUrl,
+    );
 
     await Get.generalDialog(
       barrierColor: Colors.black.withOpacity(0.8),
@@ -2085,7 +2093,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
         email: success.email,
         locale: Localizations.localeOf(currentContext!),
         appLocalizations: AppLocalizations.of(currentContext!),
-        baseDownloadUrl: session!.getDownloadUrl(dynamicUrlInterceptors.jmapUrl!),
+        baseDownloadUrl: session!.getDownloadUrl(jmapUrl: dynamicUrlInterceptors.jmapUrl),
       ),
     ));
   }
