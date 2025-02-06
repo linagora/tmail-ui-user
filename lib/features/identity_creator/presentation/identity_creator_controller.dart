@@ -353,7 +353,7 @@ class IdentityCreatorController extends BaseController with DragDropFileMixin im
   void _getAllIdentitiesSuccess(GetAllIdentitiesSuccess success) {
     if (success.identities?.isNotEmpty == true) {
       listEmailAddressDefault.value = success.identities!
-          .where((identity) => (identity.email != null && identity.email != ''))
+          .where((identity) => (identity.email != null && identity.email!.isNotEmpty))
           .map((identity) => identity.toEmailAddressNoName())
           .toSet()
           .toList();
