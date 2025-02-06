@@ -98,7 +98,7 @@ class SearchController extends BaseController with DateRangePickerMixin {
       sort: <Comparator>{}..add(
         EmailComparator(EmailComparatorProperty.receivedAt)
           ..setIsAscending(false)),
-      filter: session.getEmailAddress() == null ? null : _mappingToFilterOnSuggestionForm(currentUserEmail: session.getEmailAddress()!, query: query),
+      filter: session.getOwnEmailAddress() == null ? null : _mappingToFilterOnSuggestionForm(currentUserEmail: session.getOwnEmailAddress()!, query: query),
       properties: EmailUtils.getPropertiesForEmailGetMethod(session, accountId),
     ).then((result) => result.fold(
       (failure) => <PresentationEmail>[],

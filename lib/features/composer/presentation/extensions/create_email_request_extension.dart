@@ -25,8 +25,8 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
   Set<EmailAddress> createSenders() {
     if (identity?.email?.isNotEmpty == true) {
       return { identity!.toEmailAddress() };
-    } else if (session.getEmailAddress() != null) {
-      return { EmailAddress(null, session.getEmailAddress()) };
+    } else if (session.getOwnEmailAddress() != null) {
+      return { EmailAddress(null, session.getOwnEmailAddress()) };
     } else {
       throw Exception("CreateEmailRequestExtension::createSenders() : unknown email address for current user");
     }
@@ -36,7 +36,7 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
     if (emailActionType == EmailActionType.editDraft && fromSender.isNotEmpty) {
       return fromSender.first.emailAddress;
     } else {
-      return session.getEmailAddress() ?? '';
+      return session.getOwnEmailAddress() ?? '';
     }
   }
 
@@ -44,7 +44,7 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
     if (identity?.replyTo?.isNotEmpty == true) {
       return identity!.replyTo!.toSet();
     } else {
-      return session.getEmailAddress() == null ? {} : { EmailAddress(null, session.getEmailAddress()) };
+      return session.getOwnEmailAddress() == null ? {} : { EmailAddress(null, session.getOwnEmailAddress()) };
     }
   }
 

@@ -20,7 +20,7 @@ class SettingsFirstLevelView extends GetWidget<SettingsController> {
       child: Column(children: [
         Obx(() => UserInformationWidget(
           userName: controller.manageAccountDashboardController.accountId.value != null
-            ? UserName(controller.manageAccountDashboardController.sessionCurrent!.getEmailAddress() ?? '')
+            ? UserName(controller.manageAccountDashboardController.sessionCurrent!.getOwnEmailAddress() ?? '')
             : null,
           padding: SettingsUtils.getPaddingInFirstLevel(context, controller.responsiveUtils),
           titlePadding: const EdgeInsetsDirectional.only(start: 16))),

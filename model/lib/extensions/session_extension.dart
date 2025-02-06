@@ -53,15 +53,15 @@ extension SessionExtension on Session {
     }
   }
 
-  String? getEmailAddress() {
+  String? getOwnEmailAddress() {
     if(username.value.isEmail) {
       return username.value;
     } else {
-      return getEmailAddressFromPrincipalsCapability();
+      return getOwnEmailAddressFromPrincipalsCapability();
     }
   }
 
-  String? getEmailAddressFromPrincipalsCapability() {
+  String? getOwnEmailAddressFromPrincipalsCapability() {
     try {
       var principalsCapability = getCapabilityProperties<DefaultCapability>(AccountId(Id(username.value)), capabilityPrincipals);
     

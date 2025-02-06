@@ -168,7 +168,7 @@ void main() {
     });
   });
 
-  group('getEmailAddress test:', () {
+  group('getOwnEmailAddress test:', () {
     test(
       'should return username.value '
       'when it is a valid email and principals capability is absent',
@@ -177,7 +177,7 @@ void main() {
       final session = Session({}, {}, {}, UserName('test@example.com'), Uri(), Uri(), Uri(), Uri(), State(''),);
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, 'test@example.com');
@@ -194,7 +194,7 @@ void main() {
       );
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, 'test@example.com');
@@ -211,7 +211,7 @@ void main() {
       );
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, 'test@example.com');
@@ -225,7 +225,7 @@ void main() {
       final session = Session({}, {}, {}, UserName('notAnEmail'), Uri(), Uri(), Uri(), Uri(), State(''));
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, null);
@@ -242,7 +242,7 @@ void main() {
       );
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, null);
@@ -259,7 +259,7 @@ void main() {
       );
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, null);
@@ -288,7 +288,7 @@ void main() {
       );
 
       // act
-      final emailAddress = session.getEmailAddress();
+      final emailAddress = session.getOwnEmailAddress();
 
       // assert
       expect(emailAddress, 'bob@example.com');

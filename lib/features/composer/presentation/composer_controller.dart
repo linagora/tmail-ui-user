@@ -824,7 +824,7 @@ class ComposerController extends BaseController
     required EmailActionType actionType,
     String? listPost,
   }) {
-    final senderEmailAddress = mailboxDashBoardController.sessionCurrent?.getEmailAddress();
+    final senderEmailAddress = mailboxDashBoardController.sessionCurrent?.getOwnEmailAddress();
     final isSender = presentationEmail.from
       .asList()
       .any((element) => element.emailAddress.isNotEmpty && element.emailAddress == senderEmailAddress);
@@ -1487,7 +1487,7 @@ class ComposerController extends BaseController
       if (arguments.emailActionType == EmailActionType.editDraft) {
         return arguments.presentationEmail?.firstEmailAddressInFrom ?? '';
       } else {
-        return mailboxDashBoardController.sessionCurrent?.getEmailAddress() ?? '';
+        return mailboxDashBoardController.sessionCurrent?.getOwnEmailAddress() ?? '';
       }
     }
     return '';
