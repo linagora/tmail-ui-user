@@ -55,13 +55,7 @@ extension SessionExtensions on Session {
 
   String get internalDomain {
     try {
-      if (getOwnEmailAddress() != null) {
-        return getOwnEmailAddress()!.split('@').last;
-      } else if (GetUtils.isEmail(personalAccount.name.value)) {
-        return personalAccount.name.value.split('@').last;
-      } else {
-        return '';
-      }
+      return getOwnEmailAddress().split('@').last;
     } catch (e) {
       logError('SessionExtensions::internalDomain: Exception: $e');
       return '';

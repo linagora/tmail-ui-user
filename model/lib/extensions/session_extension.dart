@@ -12,6 +12,7 @@ import 'package:jmap_dart_client/jmap/core/capability/empty_capability.dart';
 import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:model/error_type_handler/account_exception.dart';
+import 'package:model/error_type_handler/unknown_address_exception.dart';
 import 'package:model/model.dart';
 import 'package:model/principals/capability_principals.dart';
 import 'package:uri/uri.dart';
@@ -53,23 +54,35 @@ extension SessionExtension on Session {
     }
   }
 
-  String? getOwnEmailAddress() {
+  String getOwnEmailAddress() {
     if(username.value.isEmail) {
       return username.value;
+    } else if (getOwnEmailAddressFromPersonalAccount() != null) {
+      return getOwnEmailAddressFromPersonalAccount()!;
+    } else if (getOwnEmailAddressFromPrincipalsCapability() != null) {
+      return getOwnEmailAddressFromPrincipalsCapability()!;
     } else {
-      return getOwnEmailAddressFromPrincipalsCapability();
+      throw UnknownAddressException;
+    }
+  }
+
+  String? getOwnEmailAddressFromPersonalAccount() {
+    try {
+      return personalAccount.name.value.isEmail ? personalAccount.name.value : null;
+    } catch (_) {
+      return null;
     }
   }
 
   String? getOwnEmailAddressFromPrincipalsCapability() {
     try {
       var principalsCapability = getCapabilityProperties<DefaultCapability>(AccountId(Id(username.value)), capabilityPrincipals);
-    
+
       String wrappedAddress = ((((principalsCapability?.properties
           ?.values.last) as Map<String, dynamic>)
           .values.last) as Map<String, dynamic>)
           .values.toString();
-    
+
       String address = wrappedAddress.substring("(mailto:".length, wrappedAddress.length - ")".length);
       return address.isEmail ? address : null;
     } catch (_) {

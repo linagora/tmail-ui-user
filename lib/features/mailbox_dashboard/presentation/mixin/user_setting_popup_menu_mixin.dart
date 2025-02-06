@@ -18,7 +18,7 @@ mixin UserSettingPopupMenuMixin {
     }
   ) {
     return [
-      if (currentUserEmail != null)
+      if(currentUserEmail != null)
         PopupMenuItem(
           enabled: false,
           padding: EdgeInsets.zero,

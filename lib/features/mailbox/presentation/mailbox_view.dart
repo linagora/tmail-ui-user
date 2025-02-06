@@ -226,7 +226,7 @@ class MailboxView extends BaseMailboxView {
           }
           return UserInformationWidget(
             userName: controller.mailboxDashBoardController.accountId.value != null
-              ? UserName(controller.mailboxDashBoardController.sessionCurrent!.getOwnEmailAddress() ?? '')
+              ? UserName(controller.mailboxDashBoardController.sessionCurrent!.getOwnEmailAddress())
               : null,
             subtitle: AppLocalizations.of(context).manage_account,
             onSubtitleClick: controller.mailboxDashBoardController.goToSettings,

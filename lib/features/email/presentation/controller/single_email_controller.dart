@@ -1341,7 +1341,7 @@ class SingleEmailController extends BaseController with AppLoaderMixin {
       return;
     }
 
-    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session!.getOwnEmailAddress() ?? '';
+    final receiverEmailAddress = _getReceiverEmailAddress(currentEmail!) ?? session!.getOwnEmailAddress();
     log('SingleEmailController::_handleSendReceiptToSenderAction():receiverEmailAddress: $receiverEmailAddress');
     final mdnToSender = _generateMDN(context, currentEmail!, receiverEmailAddress);
     final sendReceiptRequest = SendReceiptToSenderRequest(
