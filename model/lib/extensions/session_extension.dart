@@ -79,7 +79,7 @@ extension SessionExtension on Session {
     } else if (getOwnEmailAddressFromPrincipalsCapability() != null) {
       return getOwnEmailAddressFromPrincipalsCapability()!;
     } else {
-      throw UnknownAddressException;
+      throw UnknownAddressException();
     }
   }
 

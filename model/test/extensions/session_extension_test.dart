@@ -11,6 +11,7 @@ import 'package:jmap_dart_client/jmap/core/id.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
 import 'package:jmap_dart_client/jmap/core/state.dart';
 import 'package:jmap_dart_client/jmap/core/user_name.dart';
+import 'package:model/error_type_handler/unknown_address_exception.dart';
 import 'package:model/extensions/session_extension.dart';
 import 'package:model/principals/capability_principals.dart';
 
@@ -218,17 +219,14 @@ void main() {
     });
 
     test(
-      'should return null'
+      'should throw exception'
       'when username is not a valid email and principals capability is absent',
     () {
       // arrange
       final session = Session({}, {}, {}, UserName('notAnEmail'), Uri(), Uri(), Uri(), Uri(), State(''));
 
-      // act
-      final emailAddress = session.getOwnEmailAddress();
-
       // assert
-      expect(emailAddress, null);
+      expect(() => session.getOwnEmailAddress(), throwsA(isA<UnknownAddressException>()));
     });
 
     test(
@@ -241,11 +239,8 @@ void main() {
         {}, {}, UserName('notAnEmail'), Uri(), Uri(), Uri(), Uri(), State(''),
       );
 
-      // act
-      final emailAddress = session.getOwnEmailAddress();
-
       // assert
-      expect(emailAddress, null);
+      expect(() => session.getOwnEmailAddress(), throwsA(isA<UnknownAddressException>()));
     });
 
     test(
@@ -258,11 +253,8 @@ void main() {
         {}, {}, UserName('notAnEmail'), Uri(), Uri(), Uri(), Uri(), State(''),
       );
 
-      // act
-      final emailAddress = session.getOwnEmailAddress();
-
       // assert
-      expect(emailAddress, null);
+      expect(() => session.getOwnEmailAddress(), throwsA(isA<UnknownAddressException>()));
     });
 
     test(
