@@ -3,7 +3,6 @@ import 'package:core/presentation/state/success.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:model/upload/file_info.dart';
-import 'package:model/error_type_handler/unknown_uri_exception.dart';
 import 'package:tmail_ui_user/features/composer/domain/repository/composer_repository.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/upload_attachment_state.dart';
 
@@ -14,11 +13,10 @@ class UploadAttachmentInteractor {
 
   Stream<Either<Failure, Success>> execute(
     FileInfo fileInfo,
-    Uri? uploadUri, {
+    Uri uploadUri, {
     CancelToken? cancelToken,
   }) async* {
     try {
-      if (uploadUri == null) throw UnknownUriException();
       final uploadAttachment = await _composerRepository.uploadAttachment(
         fileInfo,
         uploadUri,

@@ -38,14 +38,14 @@ extension SessionExtension on Session {
     return downloadUrlDecode;
   }
 
-  Uri? getUploadUri(AccountId accountId, {String? jmapUrl}) {
+  Uri getUploadUri(AccountId accountId, {String? jmapUrl}) {
     final Uri uploadUrlValid;
     if (jmapUrl != null) {
       uploadUrlValid = uploadUrl.toQualifiedUrl(baseUrl: Uri.parse(jmapUrl));
     } else if (uploadUrl.hasOrigin) {
       uploadUrlValid = uploadUrl;
     } else {
-      return null;
+      throw UnknownUriException();
     }
 
     final baseUrl = '${uploadUrlValid.origin}${uploadUrlValid.path}';

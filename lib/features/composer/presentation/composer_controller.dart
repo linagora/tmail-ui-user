@@ -44,6 +44,7 @@ import 'package:tmail_ui_user/features/composer/domain/state/restore_email_inlin
 import 'package:tmail_ui_user/features/composer/domain/state/save_email_as_drafts_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/send_email_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/update_email_drafts_state.dart';
+import 'package:tmail_ui_user/features/composer/domain/state/upload_attachment_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/create_new_and_save_email_to_drafts_interactor.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/create_new_and_send_email_interactor.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/download_image_as_base64_interactor.dart';
@@ -1230,11 +1231,15 @@ class ComposerController extends BaseController
     final session = mailboxDashBoardController.sessionCurrent;
     final accountId = mailboxDashBoardController.accountId.value;
     if (session != null && accountId != null) {
-      final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
-      uploadController.justUploadAttachmentsAction(
-        uploadFiles: pickedFiles,
-        uploadUri: uploadUri,
-      );
+      try {
+        final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
+        uploadController.justUploadAttachmentsAction(
+          uploadFiles: pickedFiles,
+          uploadUri: uploadUri,
+        );
+      } catch (e) {
+        mailboxDashBoardController.handleFailureViewState(UploadAttachmentFailure(e, pickedFiles[0]));
+      }
     } else {
       log('ComposerController::_uploadAttachmentsAction: SESSION OR ACCOUNT_ID is NULL');
     }

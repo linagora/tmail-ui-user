@@ -38,6 +38,7 @@ import 'package:tmail_ui_user/features/composer/domain/state/get_autocomplete_st
 import 'package:tmail_ui_user/features/composer/domain/state/save_email_as_drafts_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/send_email_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/update_email_drafts_state.dart';
+import 'package:tmail_ui_user/features/composer/domain/state/upload_attachment_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/get_autocomplete_interactor.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/send_email_interactor.dart';
 import 'package:tmail_ui_user/features/composer/presentation/composer_bindings.dart';
@@ -161,6 +162,7 @@ import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_multiple_e
 import 'package:tmail_ui_user/features/thread/domain/usecases/mark_as_star_multiple_email_interactor.dart';
 import 'package:tmail_ui_user/features/thread/domain/usecases/move_multiple_email_to_mailbox_interactor.dart';
 import 'package:tmail_ui_user/features/thread/presentation/model/delete_action_type.dart';
+import 'package:tmail_ui_user/features/upload/presentation/controller/upload_controller.dart';
 import 'package:tmail_ui_user/main/deep_links/deep_link_data.dart';
 import 'package:tmail_ui_user/main/deep_links/deep_links_manager.dart';
 import 'package:tmail_ui_user/main/deep_links/open_app_deep_link_data.dart';
@@ -473,6 +475,9 @@ class MailboxDashBoardController extends ReloadableController
       toastManager.showMessageFailure(failure);
     } else if (failure is GetComposerCacheFailure) {
       _handleIdentityCache();
+    } else if (failure is UploadAttachmentFailure) {
+      final uploadController = Get.find<UploadController>();
+      uploadController.handleFailureViewState(failure);
     }
   }
 
