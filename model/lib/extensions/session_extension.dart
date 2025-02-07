@@ -72,7 +72,7 @@ extension SessionExtension on Session {
   }
 
   String getOwnEmailAddress() {
-    if(username.value.isEmail) {
+    if (username.value.isEmail) {
       return username.value;
     } else if (getOwnEmailAddressFromPersonalAccount() != null) {
       return getOwnEmailAddressFromPersonalAccount()!;
