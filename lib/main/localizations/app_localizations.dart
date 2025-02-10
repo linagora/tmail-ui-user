@@ -4399,4 +4399,18 @@ class AppLocalizations {
       name: 'thisHtmlAttachmentCannotBePreviewed',
     );
   }
+
+  String get sizeDescending {
+    return Intl.message(
+      'Size: Big - Small',
+      name: 'sizeDescending',
+    );
+  }
+
+  String get sizeAscending {
+    return Intl.message(
+      'Size: Small - Big',
+      name: 'sizeAscending',
+    );
+  }
 }
