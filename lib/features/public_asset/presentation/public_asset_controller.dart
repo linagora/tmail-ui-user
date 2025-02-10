@@ -9,6 +9,7 @@ import 'package:core/utils/file_utils.dart';
 import 'package:core/utils/platform_info.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/id.dart';
@@ -27,7 +28,6 @@ import 'package:tmail_ui_user/features/public_asset/domain/usecase/delete_public
 import 'package:tmail_ui_user/features/public_asset/presentation/model/public_asset_arguments.dart';
 import 'package:tmail_ui_user/features/upload/domain/extensions/platform_file_extension.dart';
 import 'package:tmail_ui_user/features/upload/domain/state/attachment_upload_state.dart';
-import 'package:tmail_ui_user/features/upload/presentation/controller/upload_controller.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 import 'package:tmail_ui_user/main/routes/route_navigation.dart';
 
@@ -128,8 +128,7 @@ class PublicAssetController extends BaseController {
     } else if (failure is PublicAssetOverQuotaFailureState) {
       _handlePublicAssetOverQuotaFailureState(failure);
     } else if (failure is UploadAttachmentFailure) {
-      final uploadController = Get.find<UploadController>();
-      uploadController.handleFailureViewState(failure);
+      _handleUploadAttachmentFailure(failure);
     }
   }
 
@@ -157,6 +156,21 @@ class PublicAssetController extends BaseController {
       appToast.showToastErrorMessage(
         currentOverlayContext!,
         AppLocalizations.of(currentContext!).generalSignatureImageUploadError);
+    }
+  }
+
+  void _handleUploadAttachmentFailure(UploadAttachmentFailure failure) {
+    if (currentContext != null && currentOverlayContext != null) {
+      appToast.showToastErrorMessage(
+          currentOverlayContext!,
+          failure.fileInfo.isInline == true
+              ? AppLocalizations.of(currentContext!).thisImageCannotBeAdded
+              : AppLocalizations.of(currentContext!).can_not_upload_this_file_as_attachments,
+          leadingSVGIconColor: Colors.white,
+          leadingSVGIcon: failure.fileInfo.isInline == true
+              ? imagePaths.icInsertImage
+              : imagePaths.icAttachment
+      );
     }
   }
 
@@ -214,7 +228,8 @@ class PublicAssetController extends BaseController {
       final uploadUri = session!.getUploadUri(accountId!, jmapUrl: dynamicUrlInterceptors.jmapUrl);
       consumeState(_uploadAttachmentInteractor.execute(fileInfo, uploadUri));
     } catch (e) {
-      handleFailureViewState(UploadAttachmentFailure(e, fileInfo));
+      log('PublicAssetController::_uploadFileToBlobAction: $e');
+      consumeState(Stream.value(Left(UploadAttachmentFailure(e, fileInfo))));
     }
   }
 

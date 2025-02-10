@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io' hide HttpClient;
 
 import 'package:collection/collection.dart';
@@ -173,7 +174,9 @@ mixin ScenarioUtilsMixin {
           attachments.add(attachment);
         }
       } catch (e) {
-        mailboxDashBoardController.handleFailureViewState(UploadAttachmentFailure(e, fileInfo));}
+        log('ScenarioUtilsMixin::uploadAttachments(): $e');
+        return attachments;
+      }
     }
 
     return attachments;
