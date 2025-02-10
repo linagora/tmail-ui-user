@@ -135,8 +135,7 @@ enum QuickSearchFilter {
         return searchFilter.emailReceiveTimeType == EmailReceiveTimeType.last7Days;
       case QuickSearchFilter.fromMe:
         return searchFilter.from.length == 1 &&
-          currentUserEmail != null &&
-          currentUserEmail.isNotEmpty == true &&
+          currentUserEmail?.isNotEmpty == true &&
           currentUserEmail == searchFilter.from.first;
       case QuickSearchFilter.sortBy:
         return sortOrderType != EmailSortOrderType.mostRecent;
