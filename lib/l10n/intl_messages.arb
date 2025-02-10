@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2025-02-10T14:23:23.832989",
+  "@@last_modified": "2025-02-10T16:33:27.241113",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4184,13 +4184,13 @@
     "placeholders_order": [],
     "placeholders": {}
   },
-  "sizeDescending": "Size: Big - Small",
+  "sizeDescending": "Size descending",
   "@sizeDescending": {
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
   },
-  "sizeAscending": "Size: Small - Big",
+  "sizeAscending": "Size ascending",
   "@sizeAscending": {
     "type": "text",
     "placeholders_order": [],

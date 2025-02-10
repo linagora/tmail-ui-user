@@ -4402,14 +4402,14 @@ class AppLocalizations {
 
   String get sizeDescending {
     return Intl.message(
-      'Size: Big - Small',
+      'Size descending',
       name: 'sizeDescending',
     );
   }
 
   String get sizeAscending {
     return Intl.message(
-      'Size: Small - Big',
+      'Size ascending',
       name: 'sizeAscending',
     );
   }
