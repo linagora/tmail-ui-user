@@ -130,6 +130,7 @@ class ComposerController extends BaseController
   final identitySelected = Rxn<Identity>();
   final listFromIdentities = RxList<Identity>();
   final isEmailChanged = Rx<bool>(false);
+  final isMarkAsImportant = Rx<bool>(false);
 
   final LocalFilePickerInteractor _localFilePickerInteractor;
   final LocalImagePickerInteractor _localImagePickerInteractor;
@@ -475,6 +476,7 @@ class ComposerController extends BaseController
       ccRecipients: listCcEmailAddress.toSet(),
       bccRecipients: listBccEmailAddress.toSet(),
       hasRequestReadReceipt: hasRequestReadReceipt.value,
+      isMarkAsImportant: isMarkAsImportant.value,
       identity: identitySelected.value,
       attachments: uploadController.attachmentsUploaded,
       inlineAttachments: uploadController.mapInlineAttachments,
@@ -1046,6 +1048,7 @@ class ComposerController extends BaseController
           ccRecipients: listCcEmailAddress.toSet(),
           bccRecipients: listBccEmailAddress.toSet(),
           hasRequestReadReceipt: hasRequestReadReceipt.value,
+          isMarkAsImportant: isMarkAsImportant.value,
           identity: identitySelected.value,
           attachments: uploadController.attachmentsUploaded,
           inlineAttachments: uploadController.mapInlineAttachments,
@@ -2343,6 +2346,7 @@ class ComposerController extends BaseController
           ccRecipients: listCcEmailAddress.toSet(),
           bccRecipients: listBccEmailAddress.toSet(),
           hasRequestReadReceipt: hasRequestReadReceipt.value,
+          isMarkAsImportant: isMarkAsImportant.value,
           identity: identitySelected.value,
           attachments: uploadController.attachmentsUploaded,
           inlineAttachments: uploadController.mapInlineAttachments,
