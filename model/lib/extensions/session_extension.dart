@@ -94,17 +94,18 @@ extension SessionExtension on Session {
   String? getOwnEmailAddressFromPrincipalsCapability() {
     try {
       var principalsCapability = getCapabilityProperties<DefaultCapability>(AccountId(Id(username.value)), capabilityPrincipals);
-
-      String wrappedAddress = ((((principalsCapability?.properties
-          ?.values.last) as Map<String, dynamic>)
-          .values.last) as Map<String, dynamic>)
-          .values.toString();
-
-      String address = wrappedAddress.substring("(mailto:".length, wrappedAddress.length - ")".length);
-      return address.isEmail ? address : null;
+      final sendTo = principalsCapability?.properties?['urn:ietf:params:jmap:calendars']?['sendTo'];
+      if (sendTo is Map<String, dynamic>) {
+        final wrappedAddress = sendTo['imip'];
+        if (wrappedAddress is String && wrappedAddress.startsWith('mailto:')) {
+          String address = wrappedAddress.substring("mailto:".length);
+          return address.isEmail ? address : null;
+        }
+      }
     } catch (_) {
       return null;
     }
+    return null;
   }
 
   JmapAccount get personalAccount {
