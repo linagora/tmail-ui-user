@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2024-11-25T10:57:37.546143",
+  "@@last_modified": "2025-02-11T11:54:33.816312",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -4200,6 +4200,12 @@
     "placeholders_order": [],
     "placeholders": {}
   },
+  "messageWarningDialogWhenExpiredOIDCTokenAndReconnection": "Your session expired. We need to take you back to the login page in order to refresh it. You might want to save the email you are currently editing before we do so.",
+  "@messageWarningDialogWhenExpiredOIDCTokenAndReconnection": {
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
   "replyToList": "Reply to list",
   "@replyToList": {
     "type": "text",
@@ -4232,8 +4238,6 @@
   },
   "editAsNewEmail": "Edit as new email",
   "@editAsNewEmail": {
-  "messageWarningDialogWhenExpiredOIDCTokenAndReconnection": "Your session expired. We need to take you back to the login page in order to refresh it. You might want to save the email you are currently editing before we do so.",
-  "@messageWarningDialogWhenExpiredOIDCTokenAndReconnection": {
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
