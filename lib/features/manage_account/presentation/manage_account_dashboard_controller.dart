@@ -364,7 +364,7 @@ class ManageAccountDashBoardController extends ReloadableController with UserSet
       position,
       popupMenuUserSettingActionTile(
         context,
-        sessionCurrent?.username,
+        sessionCurrent?.getOwnEmailAddress(),
         onLogoutAction: () {
           popBack();
           logout(context, sessionCurrent, accountId.value);

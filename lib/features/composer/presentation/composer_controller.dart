@@ -44,6 +44,7 @@ import 'package:tmail_ui_user/features/composer/domain/state/restore_email_inlin
 import 'package:tmail_ui_user/features/composer/domain/state/save_email_as_drafts_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/send_email_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/state/update_email_drafts_state.dart';
+import 'package:tmail_ui_user/features/composer/domain/state/upload_attachment_state.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/create_new_and_save_email_to_drafts_interactor.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/create_new_and_send_email_interactor.dart';
 import 'package:tmail_ui_user/features/composer/domain/usecases/download_image_as_base64_interactor.dart';
@@ -381,6 +382,8 @@ class ComposerController extends BaseController
     } else if (failure is GetAlwaysReadReceiptSettingFailure) {
       hasRequestReadReceipt.value = false;
       _initEmailDraftHash();
+    } else if (failure is UploadAttachmentFailure) {
+      _handleUploadAttachmentFailure(failure);
     }
   }
 
@@ -824,15 +827,15 @@ class ComposerController extends BaseController
     required EmailActionType actionType,
     String? listPost,
   }) {
-    final userName = mailboxDashBoardController.sessionCurrent?.username.value;
+    final senderEmailAddress = mailboxDashBoardController.sessionCurrent?.getOwnEmailAddress();
     final isSender = presentationEmail.from
       .asList()
-      .any((element) => element.emailAddress.isNotEmpty && element.emailAddress == userName);
+      .any((element) => element.emailAddress.isNotEmpty && element.emailAddress == senderEmailAddress);
 
     final recipients = presentationEmail.generateRecipientsEmailAddressForComposer(
       emailActionType: actionType,
       isSender: isSender,
-      userName: userName,
+      userName: senderEmailAddress,
       listPost: listPost,
     );
 
@@ -1226,15 +1229,35 @@ class ComposerController extends BaseController
     );
   }
 
+  void _handleUploadAttachmentFailure(UploadAttachmentFailure failure) {
+    if (currentContext != null && currentOverlayContext != null) {
+      appToast.showToastErrorMessage(
+          currentOverlayContext!,
+          failure.fileInfo.isInline == true
+              ? AppLocalizations.of(currentContext!).thisImageCannotBeAdded
+              : AppLocalizations.of(currentContext!).can_not_upload_this_file_as_attachments,
+          leadingSVGIconColor: Colors.white,
+          leadingSVGIcon: failure.fileInfo.isInline == true
+              ? imagePaths.icInsertImage
+              : imagePaths.icAttachment
+      );
+    }
+  }
+
   void _uploadAttachmentsAction({required List<FileInfo> pickedFiles}) {
     final session = mailboxDashBoardController.sessionCurrent;
     final accountId = mailboxDashBoardController.accountId.value;
     if (session != null && accountId != null) {
-      final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
-      uploadController.justUploadAttachmentsAction(
-        uploadFiles: pickedFiles,
-        uploadUri: uploadUri,
-      );
+      try {
+        final uploadUri = session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
+        uploadController.justUploadAttachmentsAction(
+          uploadFiles: pickedFiles,
+          uploadUri: uploadUri,
+        );
+      } catch (e) {
+        log('ComposerController::_uploadAttachmentsAction: $e');
+        consumeState(Stream.value(Left(UploadAttachmentFailure(e, pickedFiles[0]))));
+      }
     } else {
       log('ComposerController::_uploadAttachmentsAction: SESSION OR ACCOUNT_ID is NULL');
     }
@@ -1487,7 +1510,7 @@ class ComposerController extends BaseController
       if (arguments.emailActionType == EmailActionType.editDraft) {
         return arguments.presentationEmail?.firstEmailAddressInFrom ?? '';
       } else {
-        return mailboxDashBoardController.sessionCurrent?.username.value ?? '';
+        return mailboxDashBoardController.sessionCurrent?.getOwnEmailAddress() ?? '';
       }
     }
     return '';
