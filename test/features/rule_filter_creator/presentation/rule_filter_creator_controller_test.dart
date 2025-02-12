@@ -209,12 +209,17 @@ void main() {
         ]);
       });
 
-      when(mockTreeBuilder.generateMailboxTreeInUI([spamMailbox])).thenAnswer((_) async {
-        return Tuple4<MailboxTree, MailboxTree, MailboxTree, List<PresentationMailbox>>(
-          MailboxTree(MailboxNode(spamMailbox)),
-          MailboxTree(MailboxNode.root()),
-          MailboxTree(MailboxNode.root()),
-          [spamMailbox],
+      when(mockTreeBuilder.generateMailboxTreeInUI(
+        allMailboxes: [spamMailbox],
+        currentDefaultTree: MailboxTree(MailboxNode.root()),
+        currentPersonalTree: MailboxTree(MailboxNode.root()),
+        currentTeamMailboxTree: MailboxTree(MailboxNode.root()),
+      )).thenAnswer((_) async {
+        return (
+          allMailboxes: [spamMailbox],
+          defaultTree: MailboxTree(MailboxNode(spamMailbox)),
+          personalTree: MailboxTree(MailboxNode.root()),
+          teamMailboxTree: MailboxTree(MailboxNode.root()),
         );
       });
 
@@ -232,6 +237,10 @@ void main() {
 
       rulesFilterCreatorController.dispatchState(Right(UIClosedState()));
       rulesFilterCreatorController.listEmailRuleFilterActionSelected.clear();
+      rulesFilterCreatorController.allMailboxes.clear();
+      rulesFilterCreatorController.personalMailboxTree.value = MailboxTree(MailboxNode.root());
+      rulesFilterCreatorController.defaultMailboxTree.value = MailboxTree(MailboxNode.root());
+      rulesFilterCreatorController.teamMailboxesTree.value = MailboxTree(MailboxNode.root());
       debugDefaultTargetPlatformOverride = null;
       tester.view.reset();
     });
@@ -281,12 +290,17 @@ void main() {
         ]);
       });
 
-      when(mockTreeBuilder.generateMailboxTreeInUI([mailboxA])).thenAnswer((_) async {
-        return Tuple4<MailboxTree, MailboxTree, MailboxTree, List<PresentationMailbox>>(
-          MailboxTree(MailboxNode(mailboxA)),
-          MailboxTree(MailboxNode.root()),
-          MailboxTree(MailboxNode.root()),
-          [mailboxA],
+      when(mockTreeBuilder.generateMailboxTreeInUI(
+        allMailboxes: [mailboxA],
+        currentDefaultTree: MailboxTree(MailboxNode.root()),
+        currentPersonalTree: MailboxTree(MailboxNode.root()),
+        currentTeamMailboxTree: MailboxTree(MailboxNode.root()),
+      )).thenAnswer((_) async {
+        return (
+          allMailboxes: [mailboxA],
+          defaultTree: MailboxTree(MailboxNode.root()),
+          personalTree: MailboxTree(MailboxNode(mailboxA)),
+          teamMailboxTree: MailboxTree(MailboxNode.root()),
         );
       });
 
@@ -306,6 +320,10 @@ void main() {
 
       rulesFilterCreatorController.dispatchState(Right(UIClosedState()));
       rulesFilterCreatorController.listEmailRuleFilterActionSelected.clear();
+      rulesFilterCreatorController.allMailboxes.clear();
+      rulesFilterCreatorController.personalMailboxTree.value = MailboxTree(MailboxNode.root());
+      rulesFilterCreatorController.defaultMailboxTree.value = MailboxTree(MailboxNode.root());
+      rulesFilterCreatorController.teamMailboxesTree.value = MailboxTree(MailboxNode.root());
       debugDefaultTargetPlatformOverride = null;
       tester.view.reset();
     });
