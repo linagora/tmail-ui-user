@@ -358,7 +358,9 @@ class IdentityCreatorController extends BaseController with DragDropFileMixin im
           .toSet()
           .toList();
 
+      if (!listEmailAddressDefault.any((emailAddress) => emailAddress.email == session?.getOwnEmailAddress())) {
       listEmailAddressDefault.add(EmailAddress(null, session?.getOwnEmailAddress()));
+      }
       listEmailAddressOfReplyTo.add(noneEmailAddress);
       listEmailAddressOfReplyTo.addAll(listEmailAddressDefault);
       _setUpAllFieldEmailAddress();
