@@ -72,18 +72,13 @@ extension SessionExtension on Session {
   }
 
   String getOwnEmailAddress() {
-    if (username.value.isEmail) {
-      return username.value;
-    } else if (getOwnEmailAddressFromPersonalAccount() != null) {
-      return getOwnEmailAddressFromPersonalAccount()!;
-    } else if (getOwnEmailAddressFromPrincipalsCapability() != null) {
-      return getOwnEmailAddressFromPrincipalsCapability()!;
-    } else {
-      throw UnknownAddressException();
-    }
+    return username.value.isEmail ? username.value
+        : _getOwnEmailAddressFromPersonalAccount()
+        ?? _getOwnEmailAddressFromPrincipalsCapability()
+        ?? (throw UnknownAddressException());
   }
 
-  String? getOwnEmailAddressFromPersonalAccount() {
+  String? _getOwnEmailAddressFromPersonalAccount() {
     try {
       return personalAccount.name.value.isEmail ? personalAccount.name.value : null;
     } catch (_) {
@@ -91,7 +86,7 @@ extension SessionExtension on Session {
     }
   }
 
-  String? getOwnEmailAddressFromPrincipalsCapability() {
+  String? _getOwnEmailAddressFromPrincipalsCapability() {
     try {
       var principalsCapability = getCapabilityProperties<DefaultCapability>(AccountId(Id(username.value)), capabilityPrincipals);
       final sendTo = principalsCapability?.properties?['urn:ietf:params:jmap:calendars']?['sendTo'];
