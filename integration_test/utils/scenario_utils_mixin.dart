@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io' hide HttpClient;
 
 import 'package:collection/collection.dart';
+import 'package:core/utils/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:jmap_dart_client/http/http_client.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
@@ -174,7 +174,7 @@ mixin ScenarioUtilsMixin {
           attachments.add(attachment);
         }
       } catch (e) {
-        log('ScenarioUtilsMixin::uploadAttachments(): $e');
+        logError('ScenarioUtilsMixin::uploadAttachments(): $e');
         return attachments;
       }
     }
