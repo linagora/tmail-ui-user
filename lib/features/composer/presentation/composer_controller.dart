@@ -382,8 +382,6 @@ class ComposerController extends BaseController
     } else if (failure is GetAlwaysReadReceiptSettingFailure) {
       hasRequestReadReceipt.value = false;
       _initEmailDraftHash();
-    } else if (failure is UploadAttachmentFailure) {
-      _handleUploadAttachmentFailure(failure);
     }
   }
 
@@ -1229,20 +1227,6 @@ class ComposerController extends BaseController
     );
   }
 
-  void _handleUploadAttachmentFailure(UploadAttachmentFailure failure) {
-    if (currentContext != null && currentOverlayContext != null) {
-      appToast.showToastErrorMessage(
-          currentOverlayContext!,
-          failure.fileInfo.isInline == true
-              ? AppLocalizations.of(currentContext!).thisImageCannotBeAdded
-              : AppLocalizations.of(currentContext!).can_not_upload_this_file_as_attachments,
-          leadingSVGIconColor: Colors.white,
-          leadingSVGIcon: failure.fileInfo.isInline == true
-              ? imagePaths.icInsertImage
-              : imagePaths.icAttachment
-      );
-    }
-  }
 
   void _uploadAttachmentsAction({required List<FileInfo> pickedFiles}) {
     final session = mailboxDashBoardController.sessionCurrent;
@@ -1256,7 +1240,7 @@ class ComposerController extends BaseController
         );
       } catch (e) {
         log('ComposerController::_uploadAttachmentsAction: $e');
-        consumeState(Stream.value(Left(UploadAttachmentFailure(e, pickedFiles[0]))));
+        uploadController.consumeState(Stream.value(Left(UploadAttachmentFailure(e, pickedFiles[0]))));
       }
     } else {
       log('ComposerController::_uploadAttachmentsAction: SESSION OR ACCOUNT_ID is NULL');
