@@ -85,18 +85,10 @@ extension PresentationEmailExtension on PresentationEmail {
           listBccAddressWithoutUsername,
           []
         );
-      case EmailActionType.editDraft:
-        final listToAddressWithoutUsername = newToAddress.withoutMe(userName);
-        final listCcAddressWithoutUsername = newCcAddress.withoutMe(userName);
-        final listBccAddressWithoutUsername = newBccAddress.withoutMe(userName);
-        final listReplyToAddressWithoutUsername = newReplyToAddress;
 
-        return Tuple4(
-          listToAddressWithoutUsername,
-          listCcAddressWithoutUsername,
-          listBccAddressWithoutUsername,
-          listReplyToAddressWithoutUsername
-        );
+      case EmailActionType.editDraft:
+        return Tuple4(newToAddress, newCcAddress, newBccAddress, newReplyToAddress);
+
       default:
         final listToAddressWithoutUsername = newToAddress.withoutMe(userName);
         final listCcAddressWithoutUsername = newCcAddress.withoutMe(userName);
