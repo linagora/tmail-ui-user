@@ -29,6 +29,7 @@ mixin ScenarioUtilsMixin {
   Future<void> provisionEmail(
     List<ProvisioningEmail> provisioningEmails, {
     bool refreshEmailView = true,
+    bool requestReadReceipt = true,
   }) async {
     ComposerBindings().dependencies();
 
@@ -60,6 +61,7 @@ mixin ScenarioUtilsMixin {
           sentMailboxId: mailboxDashBoardController.mapDefaultMailboxIdByRole[PresentationMailbox.roleSent],
           identity: identity,
           attachments: attachments,
+          hasRequestReadReceipt: requestReadReceipt,
         ),
       ).last;
     }));
