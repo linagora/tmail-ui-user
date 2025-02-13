@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2025-02-11T11:54:33.816312",
+  "@@last_modified": "2025-02-13T17:07:01.807952",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -712,6 +712,18 @@
     ],
     "placeholders": {
       "nameMailbox": {}
+    }
+  },
+  "message_confirmation_dialog_allow_subaddressing_mobile": "You are about to allow anyone to send emails directly to your folder \"{nameMailbox}\" using the address <{address}>",
+  "@message_confirmation_dialog_allow_subaddressing_mobile": {
+    "type": "text",
+    "placeholders_order": [
+      "nameMailbox",
+      "address"
+    ],
+    "placeholders": {
+      "nameMailbox": {},
+      "address": {}
     }
   },
   "renameFolder": "Rename folder",
